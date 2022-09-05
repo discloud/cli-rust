@@ -10,9 +10,7 @@ pub fn authstatus() -> std::io::Result<()> {
                 stars.push('*');
             }
             println!("{} Token: {}{}", "✔".green(), &token[..5], stars);
-            if !auth::validate_token() {
-                eprintln!("{} {}", "WARN:".yellow().bold(), "Your token is invalid!".yellow())
-            }
+            super::check_token();
         }
         Err(err) => match err.kind() {
             ErrorKind::NotFound => {
