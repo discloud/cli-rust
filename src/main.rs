@@ -1,8 +1,7 @@
 pub mod auth;
 pub mod config_dir;
-use std::io::ErrorKind;
+mod commands;
 use clap::*;
-use colored::Colorize;
 #[macro_export]
 macro_rules! api_url {
     () => {"https://api.discloud.app/v2"}
@@ -39,41 +38,8 @@ fn main() -> std::io::Result<()>{
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
-        Some(("login", login_matches)) => {
-            if let Err(err) = auth::login(login_matches.get_one::<String>("token").unwrap().clone()) {
-                eprintln!("{}{}{}", "Couldn't save the token: ".red(), err.kind().to_string().red(), "✘".red());
-                return Err(err);
-            } else {
-                println!("{}", "Token saved successfully ✔".green());
-                if !auth::validate_token() {
-                    eprintln!("{} {}", "WARN:".yellow().bold(), "Your token is invalid!".yellow())
-                }
-            }
-        },
-        Some(("authstatus", _)) => {
-            match auth::get_token() {
-                Ok(token) => {
-                    println!("You're already logged in!\n");
-                    let mut stars = String::new();
-                    for _ in 0..token.len()-5 {
-                        stars.push('*');
-                    }
-                    println!("{} Token: {}{}", "✔".green(), &token[..5], stars);
-                    if !auth::validate_token() {
-                        eprintln!("{} {}", "WARN:".yellow().bold(), "Your token is invalid!".yellow())
-                    }
-                }
-                Err(err) => match err.kind() {
-                    ErrorKind::NotFound => {
-                        println!("{} You're not logged in yet!", "✘".red());
-                    },
-                    err => {
-                        eprintln!("{} Couldn't open token file: {}", "✘".red(), err);
-                    }
-                } 
-            }
-        }
+        Some(("login", login_matches)) => commands::login::login(login_matches),
+        Some(("authstatus", _)) => commands::authstatus::authstatus(),
         _ => unreachable!()
     }
-    Ok(())
 }
