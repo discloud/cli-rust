@@ -1,14 +1,14 @@
-pub mod login;
 pub mod authstatus;
-pub mod init;
-pub mod upload;
 pub mod commit;
-use dialoguer::{Select, theme::ColorfulTheme};
-use spinners::*;
+pub mod init;
+pub mod login;
+pub mod upload;
 use colored::Colorize;
+use dialoguer::{theme::ColorfulTheme, Select};
+use spinners::*;
 
 use crate::entities::FetchError;
-pub fn expect_token() -> String{
+pub fn expect_token() -> String {
     if crate::auth::validate_token() {
         log("Your token is valid!");
         return crate::auth::get_token().unwrap();
@@ -19,13 +19,11 @@ pub fn expect_token() -> String{
 }
 pub fn check_token() {
     let mut validate_spinner = Spinner::new(Spinners::Dots12, "Checking token".into());
-    validate_spinner.stop_with_message(
-        if crate::auth::validate_token() {
-            format_log("Your token is valid!")
-        } else {
-            format_err("Your token is invalid!")
-        }
-    );
+    validate_spinner.stop_with_message(if crate::auth::validate_token() {
+        format_log("Your token is valid!")
+    } else {
+        format_err("Your token is invalid!")
+    });
 }
 pub fn format_log(msg: &str) -> String {
     format!("{} {}", "✔".green().bold(), msg)
@@ -78,19 +76,19 @@ pub fn ask_for_app(token: String) -> Result<u128, FetchError> {
         0 => {
             err("You don't have any app on discloud, use `discloud up` to upload an app.");
             std::process::exit(1)
-        },
-        1 => {
-            Ok(user.apps[0].parse().unwrap())
-        },
+        }
+        1 => Ok(user.apps[0].parse().unwrap()),
         _ => {
             let apps = crate::entities::app::fetch_apps(token)?;
-            let options = apps.iter().map(|app| {
-                format!("{}: ({}) {}", app.name, app.lang, app.id)
-            }).collect::<Vec<_>>();
+            let options = apps
+                .iter()
+                .map(|app| format!("{}: ({}) {}", app.name, app.lang, app.id))
+                .collect::<Vec<_>>();
             let chosen_opt = Select::with_theme(&ColorfulTheme::default())
                 .items(&options)
                 .with_prompt("Which app you want to commit?")
-                .interact().unwrap();
+                .interact()
+                .unwrap();
             Ok(apps[chosen_opt].id.parse().unwrap())
         }
     }

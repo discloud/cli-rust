@@ -1,9 +1,9 @@
-use serde::{Deserialize};
+use serde::Deserialize;
 
 use super::FetchError;
 #[derive(Deserialize)]
 struct UserResponse {
-    user: User
+    user: User,
 }
 #[derive(Deserialize)]
 pub struct User {
@@ -21,7 +21,8 @@ pub struct User {
 }
 pub fn fetch_user(token: String) -> Result<User, FetchError> {
     let client = reqwest::blocking::Client::new();
-    let req = client.get(crate::api_url!("/user"))
+    let req = client
+        .get(crate::api_url!("/user"))
         .header("api-token", token);
     match req.send() {
         Ok(res) => {
@@ -31,6 +32,6 @@ pub fn fetch_user(token: String) -> Result<User, FetchError> {
                 Err(FetchError::APIReturnedError(res.status().as_u16()))
             }
         }
-        Err(err) => Err(FetchError::FailedToConnect(err))
+        Err(err) => Err(FetchError::FailedToConnect(err)),
     }
 }

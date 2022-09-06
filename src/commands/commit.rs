@@ -27,16 +27,15 @@ pub fn commit() {
     let src_dir = ".";
     let dst_file = get_zip_file_path();
     match zip_dir_to_file(src_dir, dst_file.to_str().unwrap(), METHOD_DEFLATED) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => super::err(&format!("Failed to zip: {:?}", e)),
     }
     let mut spinner = Spinner::new(spinners::Spinners::Earth, "Committing app...".to_string());
     let msg = match upload_zip(token, app_id) {
         Ok(()) => super::format_log("Your app was successfully commited!"),
-        Err(err) => super::format_err(&err)
+        Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
-    
 }
 
 const METHOD_DEFLATED: zip::CompressionMethod = zip::CompressionMethod::Deflated;
@@ -131,7 +130,11 @@ fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
                     if res.status().is_success() {
                         Ok(())
                     } else {
-                        Err(format!("Discloud API returned {} http code: {}", res.status().as_u16(), res.text().unwrap()))
+                        Err(format!(
+                            "Discloud API returned {} http code: {}",
+                            res.status().as_u16(),
+                            res.text().unwrap()
+                        ))
                     }
                 }
             }
