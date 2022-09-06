@@ -1,4 +1,4 @@
-use dialoguer::theme::ColorfulTheme;
+use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
 
 fn vec_from_str(s: String) -> Vec<String> {
     s.split(",").map(|s|s.trim().into()).collect()
@@ -46,21 +46,14 @@ pub fn init() -> std::io::Result<()> {
     if std::path::Path::new("discloud.config").exists() {
         super::warn("discloud.config already exists");
     }
-    let typ: String = Input::with_theme(&ColorfulTheme::default())
+    let typ = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Type")
-        .default("bot".into())
-        .show_default(true)
-        .validate_with(|t: &String| {
-            if t == "bot" || t == "site" {
-                Ok(())
-            } else {
-                Err("Only `bot` and `site` are valid")
-            }
-        })
-        .interact_text()?;
+        .default(0)
+        .items(&vec!["Bot", "Site"])
+        .interact()?;
     let mut app: App = Default::default();
-    match typ.as_str() {
-        "bot" => {
+    match typ {
+        0 => {
             app.typ = AppTyp::Bot;
             app.name = Input::with_theme(&ColorfulTheme::default())
                 .with_prompt("Bot Name")
@@ -70,7 +63,7 @@ pub fn init() -> std::io::Result<()> {
                 .allow_empty(true)
                 .interact_text()?;
         }
-        "site" => {
+        1 => {
             app.typ = AppTyp::Site;
             app.subdomain = Input::with_theme(&ColorfulTheme::default())
                 .with_prompt("Subdomain")
