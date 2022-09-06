@@ -35,11 +35,17 @@ fn main() -> std::io::Result<()>{
         .subcommand(
             Command::new("authstatus")
                 .about("Checks if you're logged in")
+        )
+        .subcommand(
+            Command::new("init")
+                .about("Creates a discloud.config file")
+                .alias("i")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
         Some(("login", login_matches)) => commands::login::login(login_matches),
         Some(("authstatus", _)) => commands::authstatus::authstatus(),
+        Some(("init", _)) => commands::init::init(),
         _ => unreachable!()
     }
 }
