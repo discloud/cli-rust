@@ -4,20 +4,20 @@ use crate::auth;
 pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
         Ok(token) => {
-            println!("You're already logged in!\n");
+            super::log("You're already logged in!\n");
             let mut stars = String::new();
             for _ in 0..token.len()-5 {
                 stars.push('*');
             }
-            println!("{} Token: {}{}", "✔".green(), &token[..5], stars);
+            super::log(&format!("Token: {}{}", &token[..5], stars));
             super::check_token();
         }
         Err(err) => match err.kind() {
             ErrorKind::NotFound => {
-                println!("{} You're not logged in yet!", "✘".red());
+                super::err("You're not logged in yet!");
             },
             err => {
-                eprintln!("{} Couldn't open token file: {}", "✘".red(), err);
+                super::err(&format!("Couldn't open token file: {}", err));
             }
         } 
     }

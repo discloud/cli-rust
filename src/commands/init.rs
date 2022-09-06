@@ -44,7 +44,7 @@ impl App {
 pub fn init() -> std::io::Result<()> {
     use dialoguer::Input;
     if std::path::Path::new("discloud.config").exists() {
-        println!("{} discloud.config already exists", "!".yellow().bold());
+        super::warn("discloud.config already exists");
     }
     let typ: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Type")
@@ -92,6 +92,6 @@ pub fn init() -> std::io::Result<()> {
         app.apt = vec_from_str(apt);
     }
     std::fs::write("discloud.config", app.get_config())?;
-    println!("{} discloud.config was created succesfully!", "✔".green().bold());
+    super::log("discloud.config was created succesfully!");
     Ok(())
 }
