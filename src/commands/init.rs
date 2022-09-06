@@ -1,4 +1,4 @@
-use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
+use dialoguer::{theme::ColorfulTheme, Select};
 
 fn vec_from_str(s: String) -> Vec<String> {
     s.split(",").map(|s|s.trim().into()).collect()
