@@ -26,7 +26,7 @@ pub fn upload() {
     let mut spinner = Spinner::new(spinners::Spinners::Earth, "Uploading app...".to_string());
     let msg = match upload_zip(token) {
         Ok(()) => super::format_log("Your app was successfully uploaded!"),
-        Err(err) => super::format_err(&err)
+        Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
 }
@@ -108,7 +108,7 @@ fn upload_zip(token: String) -> Result<(), String> {
     #[derive(Deserialize)]
     struct UploadResponse {
         status: String,
-        message: Option<String>
+        message: Option<String>,
     }
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
@@ -133,7 +133,10 @@ fn upload_zip(token: String) -> Result<(), String> {
                             Ok(())
                         }
                     } else {
-                        Err(format!("Commit failed: API returned {}", res.status().as_u16()))
+                        Err(format!(
+                            "Commit failed: API returned {}",
+                            res.status().as_u16()
+                        ))
                     }
                 }
             }
