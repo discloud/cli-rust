@@ -1,5 +1,6 @@
 pub mod login;
 pub mod authstatus;
+pub mod init;
 use spinners::*;
 use colored::Colorize;
 pub fn check_token() {
