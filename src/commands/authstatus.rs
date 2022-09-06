@@ -1,5 +1,4 @@
 use std::io::ErrorKind;
-use colored::Colorize;
 use crate::auth;
 pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
