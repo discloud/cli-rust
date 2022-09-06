@@ -346,6 +346,7 @@ dependencies = [
  "directories",
  "reqwest",
  "sentry",
+ "serde",
  "spinners",
  "walkdir",
  "zip",
