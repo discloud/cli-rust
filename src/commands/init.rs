@@ -1,4 +1,3 @@
-use colored::Colorize;
 use dialoguer::theme::ColorfulTheme;
 
 fn vec_from_str(s: String) -> Vec<String> {
