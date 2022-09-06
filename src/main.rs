@@ -1,10 +1,12 @@
 pub mod auth;
 pub mod config_dir;
+pub mod entities;
 mod commands;
 use clap::*;
 #[macro_export]
 macro_rules! api_url {
     () => {"https://api.discloud.app/v2"};
+    ($api:expr) => {format!("{}{}", $crate::api_url!(), $api)};
     ($api:literal) => {concat!($crate::api_url!(), $api)}
 }
 fn main() -> std::io::Result<()>{
@@ -46,6 +48,11 @@ fn main() -> std::io::Result<()>{
             Command::new("upload")
                 .about("Creates an app on discloud")
                 .alias("up")
+        )
+        .subcommand(
+            Command::new("commit")
+                .about("Commits to an app on discloud. If you have more than one app, it will ask which app you want to commit to.")
+                .alias("c")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -53,6 +60,7 @@ fn main() -> std::io::Result<()>{
         Some(("authstatus", _)) => commands::authstatus::authstatus(),
         Some(("init", _)) => commands::init::init(),
         Some(("upload", _)) => {commands::upload::upload(); Ok(())},
+        Some(("commit", _)) => {commands::commit::commit(); Ok(())},
         _ => unreachable!()
     }
 }

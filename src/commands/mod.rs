@@ -2,14 +2,18 @@ pub mod login;
 pub mod authstatus;
 pub mod init;
 pub mod upload;
+pub mod commit;
+use dialoguer::{Select, theme::ColorfulTheme};
 use spinners::*;
 use colored::Colorize;
+
+use crate::entities::FetchError;
 pub fn expect_token() -> String{
     if crate::auth::validate_token() {
-        format_log("Your token is valid!");
+        log("Your token is valid!");
         return crate::auth::get_token().unwrap();
     } else {
-        format_err("Your token is invalid!");
+        err("Your token is invalid!");
         std::process::exit(1);
     }
 }
@@ -66,5 +70,28 @@ mod tests {
         let mut out = String::from("!".yellow().bold().to_string());
         out.push_str(" Some warnings");
         assert_eq!(super::format_warn("Some warnings"), out)
+    }
+}
+pub fn ask_for_app(token: String) -> Result<u128, FetchError> {
+    let user = crate::entities::user::fetch_user(token.clone())?;
+    match user.apps.len() {
+        0 => {
+            err("You don't have any app on discloud, use `discloud up` to upload an app.");
+            std::process::exit(1)
+        },
+        1 => {
+            Ok(user.apps[0].parse().unwrap())
+        },
+        _ => {
+            let apps = crate::entities::app::fetch_apps(token)?;
+            let options = apps.iter().map(|app| {
+                format!("{}: ({}) {}", app.name, app.lang, app.id)
+            }).collect::<Vec<_>>();
+            let chosen_opt = Select::with_theme(&ColorfulTheme::default())
+                .items(&options)
+                .with_prompt("Which app you want to commit?")
+                .interact().unwrap();
+            Ok(apps[chosen_opt].id.parse().unwrap())
+        }
     }
 }
