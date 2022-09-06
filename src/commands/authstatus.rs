@@ -1,8 +1,6 @@
 use std::io::ErrorKind;
+use colored::Colorize;
 use crate::auth;
-use clap::Command;
-pub const AUTHSTATUS_COMMAND: Command = Command::new("authstatus")
-    .about("Checks if you're logged in");
 pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
         Ok(token) => {

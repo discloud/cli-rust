@@ -1,8 +1,6 @@
-use clap::Command;
+use colored::Colorize;
 use dialoguer::theme::ColorfulTheme;
-pub const INIT_COMMAND: Command = Command::new("init")
-    .about("Creates a discloud.config file")
-    .alias("i");
+
 fn vec_from_str(s: String) -> Vec<String> {
     s.split(",").map(|s|s.trim().into()).collect()
 }
