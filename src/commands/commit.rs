@@ -1,5 +1,4 @@
 use colored::Colorize;
-use serde::Deserialize;
 use spinners::Spinner;
 use std::io::prelude::*;
 use std::io::{Seek, Write};
@@ -15,17 +14,25 @@ fn get_zip_file_path() -> PathBuf {
     dst_file.push("discloud.zip");
     dst_file
 }
-pub fn upload() {
+pub fn commit() {
     let token = super::expect_token();
+    let app_id = match super::ask_for_app(token.clone()) {
+        Ok(app_id) => app_id,
+        Err(error) => {
+            super::err(&format!("Couldn't fetch apps: {}", error));
+            std::process::exit(1);
+        }
+    };
+
     let src_dir = ".";
     let dst_file = get_zip_file_path();
     match zip_dir_to_file(src_dir, dst_file.to_str().unwrap(), METHOD_DEFLATED) {
-        Ok(_) => super::log(" Your project is ready to upload!"),
-        Err(e) => super::err(&format!(" Failed to zip: {:?}", e)),
+        Ok(_) => {}
+        Err(e) => super::err(&format!("Failed to zip: {:?}", e)),
     }
-    let mut spinner = Spinner::new(spinners::Spinners::Earth, "Uploading app...".to_string());
-    let msg = match upload_zip(token) {
-        Ok(()) => super::format_log("Your app was successfully uploaded!"),
+    let mut spinner = Spinner::new(spinners::Spinners::Earth, "Committing app...".to_string());
+    let msg = match upload_zip(token, app_id) {
+        Ok(()) => super::format_log("Your app was successfully commited!"),
         Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
@@ -104,12 +111,7 @@ fn zip_dir_to_file(
 
     Ok(())
 }
-fn upload_zip(token: String) -> Result<(), String> {
-    #[derive(Deserialize)]
-    struct UploadResponse {
-        status: String,
-        message: Option<String>,
-    }
+fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
     let client = reqwest::blocking::Client::new();
@@ -118,7 +120,7 @@ fn upload_zip(token: String) -> Result<(), String> {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),
         Ok(form) => {
             let req = client
-                .post(crate::api_url!("/upload"))
+                .put(crate::api_url!(format!("/app/{}/commit", app_id)))
                 .multipart(form)
                 .header("api-token", token);
             let res = req.send();
@@ -126,16 +128,12 @@ fn upload_zip(token: String) -> Result<(), String> {
                 Err(err) => Err(err.to_string()),
                 Ok(res) => {
                     if res.status().is_success() {
-                        let res: UploadResponse = res.json().unwrap();
-                        if res.status == "error" {
-                            Err(format!("Commit failed: {}", res.message.unwrap()))
-                        } else {
-                            Ok(())
-                        }
+                        Ok(())
                     } else {
                         Err(format!(
-                            "Commit failed: API returned {}",
-                            res.status().as_u16()
+                            "Discloud API returned {} http code: {}",
+                            res.status().as_u16(),
+                            res.text().unwrap()
                         ))
                     }
                 }

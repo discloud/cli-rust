@@ -1,7 +1,7 @@
 use dialoguer::{theme::ColorfulTheme, Select};
 
 fn vec_from_str(s: String) -> Vec<String> {
-    s.split(",").map(|s|s.trim().into()).collect()
+    s.split(",").map(|s| s.trim().into()).collect()
 }
 
 #[derive(Default)]
@@ -26,9 +26,19 @@ impl App {
         match &self.typ {
             AppTyp::Site => {
                 if self.apt.len() > 0 {
-                    format!("ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=site\nVERSION=latest", self.subdomain, self.main, self.autorestart, self.ram, self.apt.join(","))
+                    format!(
+                        "ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=site\nVERSION=latest",
+                        self.subdomain,
+                        self.main,
+                        self.autorestart,
+                        self.ram,
+                        self.apt.join(",")
+                    )
                 } else {
-                    format!("ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nTYPE=site\nVERSION=latest", self.subdomain, self.main, self.autorestart, self.ram)
+                    format!(
+                        "ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nTYPE=site\nVERSION=latest",
+                        self.subdomain, self.main, self.autorestart, self.ram
+                    )
                 }
             }
             AppTyp::Bot => {
@@ -82,9 +92,9 @@ pub fn init() -> std::io::Result<()> {
         .with_prompt("Memory (MB)")
         .interact_text()?;
     let apt: String = Input::with_theme(&ColorfulTheme::default())
-    .with_prompt("APT Packages")
-    .allow_empty(true)
-    .interact_text()?;
+        .with_prompt("APT Packages")
+        .allow_empty(true)
+        .interact_text()?;
     if apt.len() > 0 {
         app.apt = vec_from_str(apt);
     }
