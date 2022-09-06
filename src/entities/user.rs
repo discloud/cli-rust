@@ -1,7 +1,5 @@
 use serde::{Deserialize};
 
-use crate::{commands::expect_token};
-
 use super::FetchError;
 #[derive(Deserialize)]
 struct UserResponse {
