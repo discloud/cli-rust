@@ -13,7 +13,8 @@ enum AppTyp {
 #[derive(Default)]
 struct App {
     typ: AppTyp,
-    id: u128,
+    name: String,
+    avatar: String,
     subdomain: String,
     ram: u64,
     main: String,
@@ -32,9 +33,9 @@ impl App {
             }
             AppTyp::Bot => {
                 if self.apt.len() > 0 {
-                    format!("ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=bot\nVERSION=latest", self.id, self.main, self.autorestart, self.ram, self.apt.join(","))
+                    format!("NAME={}\nAVATAR={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=bot\nVERSION=latest", self.name, self.avatar, self.main, self.autorestart, self.ram, self.apt.join(","))
                 } else {
-                    format!("ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nTYPE=bot\nVERSION=latest", self.id, self.main, self.autorestart, self.ram)
+                    format!("NAME={}\nAVATAR={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nTYPE=bot\nVERSION=latest", self.name,self.avatar, self.main, self.autorestart, self.ram)
                 }
             }
         }
@@ -61,8 +62,12 @@ pub fn init() -> std::io::Result<()> {
     match typ.as_str() {
         "bot" => {
             app.typ = AppTyp::Bot;
-            app.id = Input::with_theme(&ColorfulTheme::default())
-                .with_prompt("Bot ID")
+            app.name = Input::with_theme(&ColorfulTheme::default())
+                .with_prompt("Bot Name")
+                .interact_text()?;
+            app.avatar = Input::with_theme(&ColorfulTheme::default())
+                .with_prompt("Bot Avatar URL")
+                .allow_empty(true)
                 .interact_text()?;
         }
         "site" => {

@@ -4,7 +4,8 @@ mod commands;
 use clap::*;
 #[macro_export]
 macro_rules! api_url {
-    () => {"https://api.discloud.app/v2"}
+    () => {"https://api.discloud.app/v2"};
+    ($api:literal) => {concat!($crate::api_url!(), $api)}
 }
 fn main() -> std::io::Result<()>{
     if let Some(dir) = config_dir::get_proj_dir() {
@@ -40,12 +41,18 @@ fn main() -> std::io::Result<()>{
             Command::new("init")
                 .about("Creates a discloud.config file")
                 .alias("i")
+        )
+        .subcommand(
+            Command::new("upload")
+                .about("Creates an app on discloud")
+                .alias("up")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
         Some(("login", login_matches)) => commands::login::login(login_matches),
         Some(("authstatus", _)) => commands::authstatus::authstatus(),
         Some(("init", _)) => commands::init::init(),
+        Some(("upload", _)) => {commands::upload::upload(); Ok(())},
         _ => unreachable!()
     }
 }

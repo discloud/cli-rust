@@ -1,8 +1,18 @@
 pub mod login;
 pub mod authstatus;
 pub mod init;
+pub mod upload;
 use spinners::*;
 use colored::Colorize;
+pub fn expect_token() -> String{
+    if crate::auth::validate_token() {
+        format_log("Your token is valid!");
+        return crate::auth::get_token().unwrap();
+    } else {
+        format_err("Your token is invalid!");
+        std::process::exit(1);
+    }
+}
 pub fn check_token() {
     let mut validate_spinner = Spinner::new(Spinners::Dots12, "Checking token".into());
     validate_spinner.stop_with_message(
