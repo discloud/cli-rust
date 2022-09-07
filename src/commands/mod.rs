@@ -1,3 +1,4 @@
+pub mod apps;
 pub mod authstatus;
 pub mod commit;
 pub mod init;

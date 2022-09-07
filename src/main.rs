@@ -68,6 +68,12 @@ fn main() -> std::io::Result<()> {
                 .about("Removes an app. If you have more than one app, it will ask which app you want to delete.")
                 .alias("rm")
                 .alias("rb")
+        )
+        .subcommand(
+            Command::new("apps")
+                .about("Shows all your apps.")
+                .alias("ls")
+                .alias("list")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -84,6 +90,10 @@ fn main() -> std::io::Result<()> {
         }
         Some(("remove", _)) => {
             commands::remove::remove();
+            Ok(())
+        }
+        Some(("apps", _)) => {
+            commands::apps::apps();
             Ok(())
         }
         _ => unreachable!(),
