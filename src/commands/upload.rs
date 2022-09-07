@@ -109,6 +109,7 @@ fn upload_zip(token: String) -> Result<(), String> {
     struct UploadResponse {
         status: String,
         message: Option<String>,
+        logs: Option<String>
     }
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
@@ -125,19 +126,18 @@ fn upload_zip(token: String) -> Result<(), String> {
             match res {
                 Err(err) => Err(err.to_string()),
                 Ok(res) => {
-                    if res.status().is_success() {
-                        let res: UploadResponse = res.json().unwrap();
-                        if res.status == "error" {
-                            Err(format!("Upload failed: {}", res.message.unwrap()))
+                    let status = res.status();
+                    let res: UploadResponse = res.json().unwrap();
+                    if res.status == "error" {
+                        if let Some(logs) = res.logs {
+                            Err(format!("Upload failed: API Returned {}: {}\nLogs:\n{}", status.as_u16(), res.message.unwrap(), logs))
                         } else {
-                            Ok(())
+                            Err(format!("Upload failed: API Returned {}: {}", status.as_u16(), res.message.unwrap()))
                         }
                     } else {
-                        Err(format!(
-                            "Upload failed: API returned {}",
-                            res.status().as_u16()
-                        ))
+                        Ok(())
                     }
+                    
                 }
             }
         }
