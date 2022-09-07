@@ -16,7 +16,7 @@ fn get_zip_file_path() -> PathBuf {
 }
 pub fn commit() {
     let token = super::expect_token();
-    let app_id = match super::ask_for_app(token.clone()) {
+    let app_id = match super::ask_for_app(token.clone(), "commit") {
         Ok(app_id) => app_id,
         Err(error) => {
             super::err(&format!("Couldn't fetch apps: {}", error));
@@ -131,7 +131,7 @@ fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
                         Ok(())
                     } else {
                         Err(format!(
-                            "Discloud API returned {} http code: {}",
+                            "Commit failed: API returned {} http code: {}",
                             res.status().as_u16(),
                             res.text().unwrap()
                         ))
