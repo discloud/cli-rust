@@ -112,7 +112,7 @@ fn upload_zip(token: String) -> Result<(), String> {
     }
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::blocking::Client::builder().timeout(None).build().unwrap();
     let form = reqwest::blocking::multipart::Form::new().file("file", file_path);
     match form {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),
