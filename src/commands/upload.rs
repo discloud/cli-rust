@@ -128,13 +128,13 @@ fn upload_zip(token: String) -> Result<(), String> {
                     if res.status().is_success() {
                         let res: UploadResponse = res.json().unwrap();
                         if res.status == "error" {
-                            Err(format!("Commit failed: {}", res.message.unwrap()))
+                            Err(format!("Upload failed: {}", res.message.unwrap()))
                         } else {
                             Ok(())
                         }
                     } else {
                         Err(format!(
-                            "Commit failed: API returned {}",
+                            "Upload failed: API returned {}",
                             res.status().as_u16()
                         ))
                     }

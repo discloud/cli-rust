@@ -62,6 +62,12 @@ fn main() -> std::io::Result<()> {
             Command::new("commit")
                 .about("Commits to an app on discloud. If you have more than one app, it will ask which app you want to commit to.")
                 .alias("c")
+        )
+        .subcommand(
+            Command::new("remove")
+                .about("Removes an app. If you have more than one app, it will ask which app you want to delete.")
+                .alias("rm")
+                .alias("rb")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -74,6 +80,10 @@ fn main() -> std::io::Result<()> {
         }
         Some(("commit", _)) => {
             commands::commit::commit();
+            Ok(())
+        }
+        Some(("remove", _)) => {
+            commands::remove::remove();
             Ok(())
         }
         _ => unreachable!(),
