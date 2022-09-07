@@ -3,6 +3,7 @@ pub mod commit;
 pub mod init;
 pub mod login;
 pub mod upload;
+pub mod remove;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use spinners::*;
@@ -70,7 +71,7 @@ mod tests {
         assert_eq!(super::format_warn("Some warnings"), out)
     }
 }
-pub fn ask_for_app(token: String) -> Result<u128, FetchError> {
+pub fn ask_for_app(token: String, action: &str) -> Result<u128, FetchError> {
     let user = crate::entities::user::fetch_user(token.clone())?;
     match user.apps.len() {
         0 => {
@@ -79,14 +80,14 @@ pub fn ask_for_app(token: String) -> Result<u128, FetchError> {
         }
         1 => Ok(user.apps[0].parse().unwrap()),
         _ => {
-            let apps = crate::entities::app::fetch_apps(token)?;
+            let apps = crate::entities::app::App::fetch_all(token)?;
             let options = apps
                 .iter()
                 .map(|app| format!("{}: ({}) {}", app.name, app.lang, app.id))
                 .collect::<Vec<_>>();
             let chosen_opt = Select::with_theme(&ColorfulTheme::default())
                 .items(&options)
-                .with_prompt("Which app you want to commit?")
+                .with_prompt(format!("Which app you want to {}?", action))
                 .interact()
                 .unwrap();
             Ok(apps[chosen_opt].id.parse().unwrap())
