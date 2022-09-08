@@ -90,6 +90,12 @@ fn main() -> std::io::Result<()> {
                 .about("Restarts an app.")
                 .alias("reboot")
                 .alias("r")
+        )
+        .subcommand(
+            Command::new("logs")
+                .about("Prints logs of an app.")
+                .alias("terminal")
+                .alias("t")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -123,6 +129,10 @@ fn main() -> std::io::Result<()> {
         }
         Some(("restart", _)) => {
             commands::restart::restart();
+            Ok(())
+        }
+        Some(("logs", _)) => {
+            commands::logs::logs();
             Ok(())
         }
         _ => unreachable!(),

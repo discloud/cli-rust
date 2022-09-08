@@ -55,6 +55,36 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    pub fn get_logs(token: String, id: u128) -> Result<String, FetchError> {
+        #[derive(Deserialize)]
+        struct Terminal {
+            big: String,
+            small: String,
+            url: String
+        }
+        #[derive(Deserialize)]
+        struct AppLogs {
+            terminal: Terminal
+        }
+        #[derive(Deserialize)]
+        struct LogsResponse {
+            apps: Option<AppLogs>
+        }
+        let client = reqwest::blocking::Client::new();
+        let req = client
+            .get(crate::api_url!(format!("/app/{}/logs", id)))
+            .header("api-token", token);
+            match req.send() {
+            Ok(res) => {
+                if res.status().is_success() {
+                    Ok(res.json::<LogsResponse>().unwrap().apps.unwrap().terminal.big)
+                } else {
+                    Err(FetchError::APIReturnedError(res.status().as_u16()))
+                }
+            }
+            Err(err) => Err(FetchError::FailedToConnect(err)),
+        }
+    }
     pub fn restart(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
