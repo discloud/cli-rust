@@ -16,7 +16,7 @@ jobs:
             override: true
             components: rustfmt, clippy
       - name: Publish
-        run: cargo publish
+        run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
   release:
     name: Release ${{ matrix.target }}
     runs-on: ubuntu-latest
