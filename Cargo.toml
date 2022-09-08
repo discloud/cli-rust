@@ -1,5 +1,5 @@
 [package]
-name = "discloud-cli"
+name = "discloud"
 version = "0.2.2-alpha"
 edition = "2021"
 description = "Blazingly fast Discloud CLI"
@@ -16,6 +16,3 @@ serde = { version = "1.0.144", features = ["derive"] }
 spinners = "4.1.0"
 walkdir = "2.3.2"
 zip = "0.6.2"
-[[bin]]
-name = "discloud"
-path = "src/main.rs"
