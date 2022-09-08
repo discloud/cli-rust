@@ -1,5 +1,5 @@
 use spinners::*;
-pub fn start() {
+pub fn restart() {
     let token = super::expect_token();
     match super::ask_for_app(token.clone(), "restart") {
         Ok(app_id) => {
