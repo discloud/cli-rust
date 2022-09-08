@@ -55,6 +55,22 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    pub fn stop(token: String, id: u128) -> Result<(), FetchError> {
+        let client = reqwest::blocking::Client::new();
+        let req = client
+            .put(crate::api_url!(format!("/app/{}/stop", id)))
+            .header("api-token", token);
+            match req.send() {
+            Ok(res) => {
+                if res.status().is_success() {
+                    Ok(())
+                } else {
+                    Err(FetchError::APIReturnedError(res.status().as_u16()))
+                }
+            }
+            Err(err) => Err(FetchError::FailedToConnect(err)),
+        }
+    }
     pub fn delete(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client

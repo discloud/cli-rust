@@ -74,6 +74,12 @@ fn main() -> std::io::Result<()> {
                 .about("Shows all your apps.")
                 .alias("ls")
                 .alias("list")
+        )
+        .subcommand(
+            Command::new("stop")
+                .about("Stops an app.")
+                .alias("shutdown")
+                .alias("down")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -94,6 +100,10 @@ fn main() -> std::io::Result<()> {
         }
         Some(("apps", _)) => {
             commands::apps::apps();
+            Ok(())
+        }
+        Some(("stop", _)) => {
+            commands::stop::stop();
             Ok(())
         }
         _ => unreachable!(),
