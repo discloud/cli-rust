@@ -84,6 +84,12 @@ fn main() -> std::io::Result<()> {
         .subcommand(
             Command::new("start")
                 .about("Starts a stopped app.")
+        )
+        .subcommand(
+            Command::new("restart")
+                .about("Restarts an app.")
+                .alias("reboot")
+                .alias("r")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -113,6 +119,10 @@ fn main() -> std::io::Result<()> {
 
         Some(("start", _)) => {
             commands::start::start();
+            Ok(())
+        }
+        Some(("restart", _)) => {
+            commands::restart::restart();
             Ok(())
         }
         _ => unreachable!(),
