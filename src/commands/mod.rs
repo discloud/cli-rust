@@ -1,4 +1,5 @@
 pub mod stop;
+pub mod start;
 pub mod apps;
 pub mod authstatus;
 pub mod commit;
