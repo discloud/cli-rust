@@ -3,7 +3,7 @@ pub fn stop() {
     let token = super::expect_token();
     match super::ask_for_app(token.clone(), "shutdown") {
         Ok(app_id) => {
-            let mut spinner = Spinner::new(Spinners::Flip, "Shutting down your app".into());
+            let mut spinner = Spinner::new(Spinners::Pong, "Shutting down your app".into());
             match crate::entities::app::App::stop(token.clone(), app_id) {
                 Ok(()) => {
                     spinner.stop_with_message(super::format_log("Your app is down!"));
