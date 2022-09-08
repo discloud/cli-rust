@@ -1,4 +1,4 @@
-# cli-rust
+# Discloud Rust CLI
 [![Build & Upload](https://github.com/discloud/cli-rust/actions/workflows/release.yml/badge.svg)](https://github.com/discloud/cli-rust/actions/workflows/release.yml) [![discloud cli crate badge](https://shields.io/crates/v/discloud-cli)](https://crates.io/crates/discloud-cli) ![license badge](https://img.shields.io/github/license/discloud/cli-rust) ![issues](https://img.shields.io/github/issues/discloud/cli-rust) ![pull requests](https://img.shields.io/github/issues-pr/discloud/cli-rust?color=blue)
 
 Blazingly fast Discloud CLI to host your apps.
