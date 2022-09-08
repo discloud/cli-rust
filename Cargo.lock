@@ -338,7 +338,7 @@ dependencies = [
 
 [[package]]
 name = "discloud"
-version = "0.2.2-alpha"
+version = "0.3.0-alpha"
 dependencies = [
  "clap",
  "colored",
