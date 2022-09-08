@@ -337,8 +337,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "discloud-cli"
-version = "0.1.1-alpha"
+name = "discloud"
+version = "0.2.2-alpha"
 dependencies = [
  "clap",
  "colored",
