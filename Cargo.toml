@@ -1,6 +1,6 @@
 [package]
 name = "discloud"
-version = "0.3.1-alpha"
+version = "0.3.2-alpha"
 edition = "2021"
 description = "Blazingly fast Discloud CLI"
 license = "Apache-2.0"
