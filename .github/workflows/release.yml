@@ -18,18 +18,49 @@ jobs:
       - name: Publish
         run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
   release:
-    name: Release ${{ matrix.target }}
-    runs-on: ubuntu-latest
+    name: Build on ${{ matrix.target }} and upload
+    runs-on: ${{ matrix.target }}
     strategy:
       fail-fast: false
       matrix:
-        target: [x86_64-pc-windows-gnu, x86_64-unknown-linux-gnu, x86_64-apple-darwin]
+        target: [windows-latest, macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@master
-      - name: Compile and release
-        uses: coffee-is-power/rust-build.action@master
+      
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1.3.1
+        with:
+          toolchain: stable
+          
+      - name: Linux | Install OpenSSL
+        if: runner.os == 'Linux'
+        run: sudo apt install libssl-dev
+      - name: Compile
+        run: cargo build -r
+        env:
+          OPENSSL_STATIC: 1
+         
+      - name: Windows | Zip
+        uses: vimtor/action-zip@v1
+        with: 
+          files: target/release/discloud.exe README.md LICENSE
+          dest: discloud.zip
+        if: runner.os == 'Windows'
+        
+        
+      - name: Linux & Mac | Zip
+        uses: vimtor/action-zip@v1
+        with: 
+          files: target/release/discloud README.md LICENSE
+          dest: discloud.zip
+        if: runner.os != 'Windows'
+  
+      - name: Upload zip
+        uses: WebFreak001/upload-asset@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          EXTRA_FILES: "README.md LICENSE"
+          file: ./discloud.zip
+          mime: application/zip
+          name: discloud-x86_64-${{ runner.os }}.zip
