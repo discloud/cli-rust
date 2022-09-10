@@ -41,7 +41,7 @@ impl Debug for Feature {
 }
 #[derive(Deserialize, Serialize)]
 pub struct Mod {
-    #[serde(rename = "mod_id")]
+    #[serde(rename = "modID")]
     user_id: u128,
     #[serde(rename = "perms")]
     features: Vec<Feature>
