@@ -147,4 +147,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+
+    
 }

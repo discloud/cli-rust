@@ -101,6 +101,19 @@ fn main() -> std::io::Result<()> {
             Command::new("aboutme")
                 .about("Shows information about you.")
                 .alias("user")
+        )
+        .subcommand(
+            Command::new("mods")
+                .about("Manages your apps' mods")
+                .subcommand_required(true)
+                .arg_required_else_help(true)
+                .alias("m")
+                .subcommand(
+                    Command::new("add")
+                        .about("Adds a mod to an app, by default, the mod can only see the logs and status, use `discloud mods allow` to allow more actions.")
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set).required(true))
+                )
+                .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -143,6 +156,16 @@ fn main() -> std::io::Result<()> {
         Some(("aboutme", _)) => {
             commands::aboutme::aboutme();
             Ok(())
+        }
+        Some(("mods", matches)) => {
+            match matches.subcommand() {
+                Some(("add", matches)) => {
+                    let id: u128 = *matches.get_one("id").unwrap();
+                    commands::mods::add::add(id);
+                    Ok(())
+                }
+                _ => unreachable!()
+            }
         }
         _ => unreachable!(),
     }
