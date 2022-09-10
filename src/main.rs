@@ -96,6 +96,11 @@ fn main() -> std::io::Result<()> {
                 .about("Prints logs of an app.")
                 .alias("terminal")
                 .alias("t")
+        )
+        .subcommand(
+            Command::new("aboutme")
+                .about("Shows information about you.")
+                .alias("user")
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
@@ -133,6 +138,10 @@ fn main() -> std::io::Result<()> {
         }
         Some(("logs", _)) => {
             commands::logs::logs();
+            Ok(())
+        }
+        Some(("aboutme", _)) => {
+            commands::aboutme::aboutme();
             Ok(())
         }
         _ => unreachable!(),

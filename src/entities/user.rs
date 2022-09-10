@@ -1,9 +1,13 @@
 use serde::Deserialize;
 
 use super::FetchError;
+
 #[derive(Deserialize)]
-struct UserResponse {
-    user: User,
+pub struct UserDate {
+    pub days: u32,
+    pub hours: u32,
+    pub minutes: u32,
+    pub seconds: u32,
 }
 #[derive(Deserialize)]
 pub struct User {
@@ -18,8 +22,20 @@ pub struct User {
     #[serde(rename = "customdomains")]
     pub custom_domains: Vec<String>,
     pub apps: Vec<String>,
+    pub plan: String,
+    pub locale: String,
+    #[serde(rename = "planDataEnd")]
+    pub plan_data_end: chrono::DateTime<chrono::Utc>,
+    #[serde(rename = "lastDataLeft")]
+    pub last_data_left: UserDate
 }
 pub fn fetch_user(token: String) -> Result<User, FetchError> {
+    #[derive(Deserialize)]
+    struct UserResponse {
+        user: User,
+        status: String,
+        message: String
+    }
     let client = reqwest::blocking::Client::new();
     let req = client
         .get(crate::api_url!("/user"))
@@ -27,7 +43,16 @@ pub fn fetch_user(token: String) -> Result<User, FetchError> {
     match req.send() {
         Ok(res) => {
             if res.status().is_success() {
-                Ok(res.json::<UserResponse>().unwrap().user)
+                let res = res.json::<UserResponse>().unwrap();
+                match res.status.as_str() {
+                    "ok" => {
+                        Ok(res.user)
+                    }
+                    "error" => {
+                        Err(FetchError::FailedWithMessage(res.message))
+                    }
+                    _ => unreachable!()
+                }
             } else {
                 Err(FetchError::APIReturnedError(res.status().as_u16()))
             }
