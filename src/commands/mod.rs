@@ -1,3 +1,4 @@
+pub mod mods;
 pub mod aboutme;
 pub mod logs;
 pub mod stop;

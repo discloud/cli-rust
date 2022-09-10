@@ -1,3 +1,4 @@
+pub mod moderator;
 use std::fmt::Display;
 
 pub mod app;
