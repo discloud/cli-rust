@@ -1,9 +1,16 @@
 [package]
 name = "discloud"
+rust-version = "1.63.0"
+authors = ["coffee-is-power"]
+repository = "https://github.com/discloud/cli-rust/"
 version = "0.3.2-alpha"
 edition = "2021"
 description = "Blazingly fast Discloud CLI"
 license = "Apache-2.0"
+license-file = "LICENSE"
+categories = ["command-line-utilities"]
+keywords = ["discloud", "cli", "bot", "fast", "discord"]
+readme = "README.md"
 
 [dependencies]
 chrono = { version = "0.4.22", features = ["serde"] }
