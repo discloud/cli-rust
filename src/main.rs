@@ -25,8 +25,8 @@ fn main() -> std::io::Result<()> {
         "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
         sentry::ClientOptions {
             release: sentry::release_name!(),
-            environment: Some("development".into()),
-            traces_sample_rate: 1.0,
+            environment: Some("production".into()),
+            traces_sample_rate: 0.2,
 
             ..Default::default()
         },
