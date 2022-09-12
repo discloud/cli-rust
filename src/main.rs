@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
         return Ok(());
     }
     let _guard = sentry::init((
-        "https://dcfffa2a0b34450c980b4dff8c479a45@o1394903.ingest.sentry.io/6719901",
+        "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
         sentry::ClientOptions {
             release: sentry::release_name!(),
             ..Default::default()
