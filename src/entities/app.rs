@@ -38,7 +38,7 @@ impl App {
     pub fn fetch(token: String, id: u128) -> Result<App, FetchError> {
         #[derive(Deserialize)]
         struct AppResponse {
-            pub apps: App,
+            pub apps: App
         }
         let client = reqwest::blocking::Client::new();
         let req = client
