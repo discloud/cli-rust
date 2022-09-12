@@ -1,4 +1,5 @@
 use clap::*;
+#[tracing::instrument]
 pub fn login(matches: &ArgMatches) -> std::io::Result<()> {
     let token = matches.get_one::<String>("token").unwrap().clone();
     if let Err(err) = crate::auth::login(token) {

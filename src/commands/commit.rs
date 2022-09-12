@@ -9,11 +9,13 @@ use zip::write::FileOptions;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
+#[tracing::instrument]
 fn get_zip_file_path() -> PathBuf {
     let mut dst_file = std::env::temp_dir();
     dst_file.push("discloud.zip");
     dst_file
 }
+#[tracing::instrument]
 pub fn commit() {
     let token = super::expect_token();
     let app_id = match super::ask_for_app(token.clone(), "commit") {
@@ -75,6 +77,7 @@ where
     Result::Ok(())
 }
 
+#[tracing::instrument]
 fn zip_dir_to_file(
     src_dir: &str,
     dst_file: &str,
@@ -111,10 +114,14 @@ fn zip_dir_to_file(
 
     Ok(())
 }
+#[tracing::instrument]
 fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
-    let client = reqwest::blocking::Client::builder().timeout(None).build().unwrap();
+    let client = reqwest::blocking::Client::builder()
+        .timeout(None)
+        .build()
+        .unwrap();
     let form = reqwest::blocking::multipart::Form::new().file("file", file_path);
     match form {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),

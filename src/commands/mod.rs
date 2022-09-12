@@ -1,21 +1,42 @@
-pub mod mods;
 pub mod aboutme;
-pub mod logs;
-pub mod stop;
-pub mod start;
-pub mod restart;
 pub mod apps;
 pub mod authstatus;
 pub mod commit;
 pub mod init;
 pub mod login;
-pub mod upload;
+pub mod logs;
+pub mod mods;
 pub mod remove;
+pub mod restart;
+pub mod start;
+pub mod stop;
+pub mod upload;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use spinners::*;
-
+#[macro_export]
+macro_rules! handle_result {
+    ($v:expr) => {
+        match $v {
+            Ok(v) => v,
+            Err(err) => {
+                super::err(&err.to_string());
+                std::process::exit(1);
+            }
+        }
+    };
+    ($v:expr, $spinner:ident) => {
+        match $v {
+            Ok(v) => v,
+            Err(err) => {
+                $spinner.stop_with_message(super::format_err(&err.to_string()));
+                std::process::exit(1);
+            }
+        }
+    };
+}
 use crate::entities::FetchError;
+#[tracing::instrument]
 pub fn expect_token() -> String {
     if crate::auth::validate_token() {
         log("Your token is valid!");

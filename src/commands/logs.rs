@@ -1,5 +1,6 @@
 use spinners::{Spinner, Spinners};
 
+#[tracing::instrument]
 pub fn logs(){
     let token = super::expect_token();
     match super::ask_for_app(token.clone(), "show the logs") {

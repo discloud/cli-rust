@@ -1,5 +1,6 @@
 use crate::auth;
 use std::io::ErrorKind;
+#[tracing::instrument]
 pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
         Ok(token) => {

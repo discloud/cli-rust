@@ -1,9 +1,8 @@
 use std::fmt::Debug;
-
 use serde::{Deserialize, Serialize};
 use serde_enum_str::*;
+use super::FetchError;
 
-use super::{app::App, user::User, FetchError};
 #[derive(Deserialize_enum_str, Serialize_enum_str, Clone)]
 pub enum Feature {
     #[serde(rename = "start_app")]
@@ -37,44 +36,50 @@ impl Debug for Feature {
         })
     }
 }
-#[derive(Deserialize, Serialize, Clone)]
-pub struct Mod<'a> {
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct Mod {
     #[serde(rename = "modID")]
-    user_id: u128,
+    user_id: String,
     #[serde(rename = "perms")]
     features: Vec<Feature>,
     #[serde(skip)]
-    app: Option<&'a App>,
+    app_id: u128,
 }
-impl<'a> Mod<'a> {
+impl Mod {
+    #[tracing::instrument]
     pub fn new(
         token: String,
-        user: &User,
-        app: &'a App,
+        user_id: u128,
+        app_id: u128,
         features: Vec<Feature>,
-    ) -> Result<Mod<'a>, FetchError> {
+    ) -> Result<Mod, FetchError> {
         let moderator = Self {
-            user_id: user.user_id.parse().unwrap(),
+            user_id: user_id.to_string(),
             features,
-            app: Some(app),
+            app_id,
         };
         moderator.add(token)?;
         Ok(moderator)
     }
+
+    pub fn id(&self) -> u128 {
+        self.user_id.parse().unwrap()
+    }
+    #[tracing::instrument]
     pub fn fetch_mod(
         token: String,
-        user: &User,
-        app: &'a App,
-    ) -> Result<Option<Mod<'a>>, FetchError> {
+        user_id: u128,
+        app_id: u128,
+    ) -> Result<Option<Mod>, FetchError> {
         #[derive(Deserialize)]
-        struct Response<'a> {
+        struct Response {
             status: String,
             message: Option<String>,
-            team: Option<Vec<Mod<'a>>>,
+            team: Option<Vec<Mod>>,
         }
         let client = reqwest::blocking::Client::new();
         let req = client
-            .get(crate::api_url!(format!("/app/{}/team", app.id)))
+            .get(crate::api_url!(format!("/app/{}/team", app_id)))
             .header("api-token", token);
         match req.send() {
             Ok(res) => match res.json::<Response>() {
@@ -85,9 +90,9 @@ impl<'a> Mod<'a> {
                             .team
                             .unwrap()
                             .iter()
-                            .find(|m| m.user_id.to_string() == user.user_id)
+                            .find(|m| m.user_id == user_id.to_string())
                             .map(|m| Self {
-                                app: Some(app),
+                                app_id,
                                 ..m.clone()
                             });
                         Ok(moderator)
@@ -99,19 +104,13 @@ impl<'a> Mod<'a> {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn get_features(&self) -> Vec<Feature> {
         self.features.clone()
     }
-    /// Returns the app this moderator is at
-    /// # Panics
-    /// This will panic if `app` is **None**
-    pub fn get_app(&'a self) -> &'a App {
-        self.app.unwrap()
-    }
     /// Adds this moderator to the app
-    /// # Panics
-    /// This will panic if `app` is **None**
-    pub fn add(&'a self, token: String) -> Result<(), FetchError> {
+    #[tracing::instrument]
+    pub fn add(&self, token: String) -> Result<(), FetchError> {
         #[derive(Deserialize)]
         struct Response {
             status: String,
@@ -119,7 +118,7 @@ impl<'a> Mod<'a> {
         }
         let client = reqwest::blocking::Client::new();
         let req = client
-            .post(crate::api_url!(format!("/app/{}/team", self.get_app().id)))
+            .post(crate::api_url!(format!("/app/{}/team", self.app_id)))
             .header("api-token", token)
             .json(self);
         match req.send() {
@@ -137,6 +136,7 @@ impl<'a> Mod<'a> {
         }
     }
 
+    #[tracing::instrument]
     pub fn remove(self, token: String) -> Result<(), FetchError> {
         #[derive(Deserialize)]
         struct Response {
@@ -147,7 +147,7 @@ impl<'a> Mod<'a> {
         let req = client
             .delete(crate::api_url!(format!(
                 "/app/{}/team/{}",
-                self.get_app().id,
+                self.app_id,
                 self.user_id
             )))
             .header("api-token", token);

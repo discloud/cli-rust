@@ -51,6 +51,7 @@ impl App {
         }
     }
 }
+#[tracing::instrument]
 pub fn init() -> std::io::Result<()> {
     use dialoguer::Input;
     if std::path::Path::new("discloud.config").exists() {
