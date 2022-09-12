@@ -113,6 +113,12 @@ fn main() -> std::io::Result<()> {
                         .about("Adds a mod to an app, by default, the mod can only see the logs and status, use `discloud mods allow` to allow more actions.")
                         .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set).required(true))
                 )
+                .subcommand(
+                    Command::new("remove")
+                        .alias("rm")
+                        .about("Removes a moderator from your app.")
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set).required(true))
+                )
                 .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
     let matches = cmd.get_matches();
@@ -157,16 +163,19 @@ fn main() -> std::io::Result<()> {
             commands::aboutme::aboutme();
             Ok(())
         }
-        Some(("mods", matches)) => {
-            match matches.subcommand() {
-                Some(("add", matches)) => {
-                    let id: u128 = *matches.get_one("id").unwrap();
-                    commands::mods::add::add(id);
-                    Ok(())
-                }
-                _ => unreachable!()
+        Some(("mods", matches)) => match matches.subcommand() {
+            Some(("add", matches)) => {
+                let id: u128 = *matches.get_one("id").unwrap();
+                commands::mods::add::add(id);
+                Ok(())
             }
-        }
+            Some(("remove", matches)) => {
+                let id: u128 = *matches.get_one("id").unwrap();
+                commands::mods::remove::remove(id);
+                Ok(())
+            }
+            _ => unreachable!(),
+        },
         _ => unreachable!(),
     }
 }
