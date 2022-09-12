@@ -1,6 +1,7 @@
 use colored::Colorize;
 
 use crate::entities::FetchError;
+#[tracing::instrument]
 pub fn apps() {
     let token = super::expect_token();
     match crate::entities::app::App::fetch_all(token.clone()) {

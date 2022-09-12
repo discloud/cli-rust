@@ -1,4 +1,5 @@
 use spinners::*;
+#[tracing::instrument]
 pub fn stop() {
     let token = super::expect_token();
     match super::ask_for_app(token.clone(), "shutdown") {
