@@ -3,6 +3,7 @@ mod commands;
 pub mod config_dir;
 pub mod entities;
 use clap::*;
+use tracing_subscriber::prelude::*;
 #[macro_export]
 macro_rules! api_url {
     () => {
@@ -16,19 +17,26 @@ macro_rules! api_url {
     };
 }
 fn main() -> std::io::Result<()> {
+    tracing_subscriber::Registry::default()
+        .with(sentry::integrations::tracing::layer())
+        .init();
+
+    let _guard = sentry::init((
+        "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            environment: Some("development".into()),
+            traces_sample_rate: 1.0,
+
+            ..Default::default()
+        },
+    ));
     if let Some(dir) = config_dir::get_proj_dir() {
         std::fs::create_dir_all(dir)?;
     } else {
         eprintln!("ERROR: Couldn't find a directory for config files.");
         return Ok(());
     }
-    let _guard = sentry::init((
-        "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            ..Default::default()
-        },
-    ));
     let cmd = Command::new("discloud")
         .about("Blazingly Fast CLI for discloud")
         .subcommand_required(true)

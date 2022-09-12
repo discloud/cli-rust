@@ -1,7 +1,7 @@
 use super::*;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct App {
     pub name: String,
     pub id: String,
@@ -14,6 +14,7 @@ pub struct App {
     pub lang: String,
 }
 impl App {
+    #[tracing::instrument]
     pub fn fetch_all(token: String) -> Result<Vec<App>, FetchError> {
         #[derive(Deserialize)]
         struct AppsResponse {
@@ -34,11 +35,11 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    
+    #[tracing::instrument]
     pub fn fetch(token: String, id: u128) -> Result<App, FetchError> {
         #[derive(Deserialize)]
         struct AppResponse {
-            pub apps: App
+            pub apps: App,
         }
         let client = reqwest::blocking::Client::new();
         let req = client
@@ -55,27 +56,34 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn get_logs(token: String, id: u128) -> Result<String, FetchError> {
         #[derive(Deserialize)]
         struct Terminal {
-            big: String
+            big: String,
         }
         #[derive(Deserialize)]
         struct AppLogs {
-            terminal: Terminal
+            terminal: Terminal,
         }
         #[derive(Deserialize)]
         struct LogsResponse {
-            apps: Option<AppLogs>
+            apps: Option<AppLogs>,
         }
         let client = reqwest::blocking::Client::new();
         let req = client
             .get(crate::api_url!(format!("/app/{}/logs", id)))
             .header("api-token", token);
-            match req.send() {
+        match req.send() {
             Ok(res) => {
                 if res.status().is_success() {
-                    Ok(res.json::<LogsResponse>().unwrap().apps.unwrap().terminal.big)
+                    Ok(res
+                        .json::<LogsResponse>()
+                        .unwrap()
+                        .apps
+                        .unwrap()
+                        .terminal
+                        .big)
                 } else {
                     Err(FetchError::APIReturnedError(res.status().as_u16()))
                 }
@@ -83,12 +91,13 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn restart(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/app/{}/restart", id)))
             .header("api-token", token);
-            match req.send() {
+        match req.send() {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
@@ -99,12 +108,13 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn start(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/app/{}/start", id)))
             .header("api-token", token);
-            match req.send() {
+        match req.send() {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
@@ -115,12 +125,13 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn stop(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/app/{}/stop", id)))
             .header("api-token", token);
-            match req.send() {
+        match req.send() {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
@@ -131,12 +142,13 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
+    #[tracing::instrument]
     pub fn delete(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .delete(crate::api_url!(format!("/app/{}/delete", id)))
             .header("api-token", token);
-            match req.send() {
+        match req.send() {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
@@ -147,6 +159,4 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-
-    
 }

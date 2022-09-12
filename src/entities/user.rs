@@ -2,14 +2,14 @@ use serde::Deserialize;
 
 use super::FetchError;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct UserDate {
     pub days: u32,
     pub hours: u32,
     pub minutes: u32,
     pub seconds: u32,
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct User {
     #[serde(rename = "userID")]
     pub user_id: String,
@@ -27,14 +27,15 @@ pub struct User {
     #[serde(rename = "planDataEnd")]
     pub plan_data_end: chrono::DateTime<chrono::Utc>,
     #[serde(rename = "lastDataLeft")]
-    pub last_data_left: UserDate
+    pub last_data_left: UserDate,
 }
+#[tracing::instrument]
 pub fn fetch_user(token: String) -> Result<User, FetchError> {
     #[derive(Deserialize)]
     struct UserResponse {
         user: User,
         status: String,
-        message: String
+        message: String,
     }
     let client = reqwest::blocking::Client::new();
     let req = client
@@ -45,13 +46,9 @@ pub fn fetch_user(token: String) -> Result<User, FetchError> {
             if res.status().is_success() {
                 let res = res.json::<UserResponse>().unwrap();
                 match res.status.as_str() {
-                    "ok" => {
-                        Ok(res.user)
-                    }
-                    "error" => {
-                        Err(FetchError::FailedWithMessage(res.message))
-                    }
-                    _ => unreachable!()
+                    "ok" => Ok(res.user),
+                    "error" => Err(FetchError::FailedWithMessage(res.message)),
+                    _ => unreachable!(),
                 }
             } else {
                 Err(FetchError::APIReturnedError(res.status().as_u16()))
