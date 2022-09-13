@@ -1,7 +1,7 @@
-use std::fmt::Debug;
+use super::FetchError;
 use serde::{Deserialize, Serialize};
 use serde_enum_str::*;
-use super::FetchError;
+use std::fmt::Debug;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Clone)]
 pub enum Feature {
@@ -64,6 +64,37 @@ impl Mod {
 
     pub fn id(&self) -> u128 {
         self.user_id.parse().unwrap()
+    }
+    #[tracing::instrument]
+    pub fn set_features(
+        &mut self,
+        permissions: Vec<Feature>,
+        token: String,
+    ) -> Result<(), FetchError> {
+        self.features = permissions;
+        #[derive(Deserialize)]
+        struct Response {
+            status: String,
+            message: Option<String>,
+        }
+        let client = reqwest::blocking::Client::new();
+        let req = client
+            .put(crate::api_url!(format!("/app/{}/team", self.app_id)))
+            .header("api-token", token)
+            .json(self);
+        match req.send() {
+            Ok(res) => match res.json::<Response>() {
+                Err(err) => Err(FetchError::FailedWithMessage(err.to_string())),
+                Ok(response) => {
+                    if response.status == "ok" {
+                        Ok(())
+                    } else {
+                        Err(FetchError::FailedWithMessage(response.message.unwrap()))
+                    }
+                }
+            },
+            Err(err) => Err(FetchError::FailedToConnect(err)),
+        }
     }
     #[tracing::instrument]
     pub fn fetch_mod(
@@ -147,8 +178,7 @@ impl Mod {
         let req = client
             .delete(crate::api_url!(format!(
                 "/app/{}/team/{}",
-                self.app_id,
-                self.user_id
+                self.app_id, self.user_id
             )))
             .header("api-token", token);
         match req.send() {
