@@ -21,7 +21,19 @@ fn main() -> std::io::Result<()> {
     tracing_subscriber::Registry::default()
         .with(sentry::integrations::tracing::layer())
         .init();
-
+    fn parse_feature(feature: &str) -> Result<Feature, String> {
+        match feature {
+            "start" => Ok(Feature::Start),    
+            "stop" => Ok(Feature::Stop), 
+            "restart" => Ok(Feature::Restart),
+            "logs" => Ok(Feature::SeeLogs),
+            "commit" => Ok(Feature::Commit),
+            "status" => Ok(Feature::Status),
+            "setram" => Ok(Feature::SetRam),
+            "backup" => Ok(Feature::Backup),
+            _ => Err(format!("Invalid permission: {}", feature)),
+        }
+    }
     let _guard = sentry::init((
         "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
         sentry::ClientOptions {
@@ -133,24 +145,30 @@ fn main() -> std::io::Result<()> {
                 .subcommand(
                     Command::new("allow")
                         .about("Gives permissions to a moderator")
-                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set))
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set)
+                                .required(true))
+                        .arg(Arg::new("to").value_parser(["to"]).action(clap::ArgAction::Set).required(true))                        
                         .arg(
                             Arg::new("perm")
-                                .value_parser(value_parser!(Feature))
+                                .value_parser(parse_feature)
                                 .action(clap::ArgAction::Append)
-                                .multiple_occurrences(true)
+                                .min_values(1)
+                                .required(true)
                         )
                 )
                 .subcommand(
                     Command::new("deny")
                         .about("Removes permissions from a moderator")
-                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set))
                         .arg(
                             Arg::new("perm")
-                                .value_parser(value_parser!(Feature))
+                                .value_parser(parse_feature)
                                 .action(clap::ArgAction::Append)
-                                .multiple_occurrences(true)
+                                .min_values(1)
+                                .required(true)
                         )
+                        .arg(Arg::new("to").value_parser(["to"]).action(clap::ArgAction::Set).required(true))
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set)
+                                .required(true))
                 )
                 .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
