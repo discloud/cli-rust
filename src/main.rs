@@ -3,6 +3,7 @@ mod commands;
 pub mod config_dir;
 pub mod entities;
 use clap::*;
+use entities::moderator::Feature;
 use tracing_subscriber::prelude::*;
 #[macro_export]
 macro_rules! api_url {
@@ -25,9 +26,11 @@ fn main() -> std::io::Result<()> {
         "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
         sentry::ClientOptions {
             release: sentry::release_name!(),
-            environment: Some("production".into()),
-            traces_sample_rate: 0.2,
-
+            traces_sample_rate: if cfg!(debug_assertions) {
+                1.0
+            } else {
+                0.2
+            },
             ..Default::default()
         },
     ));
@@ -127,6 +130,17 @@ fn main() -> std::io::Result<()> {
                         .about("Removes a moderator from your app.")
                         .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set).required(true))
                 )
+                .subcommand(
+                    Command::new("allow")
+                        .about("Gives permissions to a moderator")
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set))
+                        .arg(
+                            Arg::new("perm")
+                                .value_parser(value_parser!(Feature))
+                                .action(clap::ArgAction::Append)
+                                .multiple_occurrences(true)
+                        )
+                )
                 .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
     let matches = cmd.get_matches();
@@ -182,8 +196,16 @@ fn main() -> std::io::Result<()> {
                 commands::mods::remove::remove(id);
                 Ok(())
             }
-            _ => unreachable!(),
+            Some(("allow", matches)) => {
+                let id: u128 = *matches.get_one("id").unwrap();
+                let features: Vec<Feature> = matches.get_many("perm").unwrap()
+                    .map(|perm: &Feature| perm.clone())
+                    .collect();
+                commands::mods::allow::allow(id, features);
+                Ok(())
+            }
+            _ => panic!(),
         },
-        _ => unreachable!(),
+        _ => panic!(),
     }
 }
