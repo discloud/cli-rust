@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_enum_str::*;
 use std::fmt::Debug;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Clone)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Clone, Eq, PartialEq)]
 pub enum Feature {
     #[serde(rename = "start_app")]
     Start,

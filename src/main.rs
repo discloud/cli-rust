@@ -141,6 +141,17 @@ fn main() -> std::io::Result<()> {
                                 .multiple_occurrences(true)
                         )
                 )
+                .subcommand(
+                    Command::new("deny")
+                        .about("Removes permissions from a moderator")
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set))
+                        .arg(
+                            Arg::new("perm")
+                                .value_parser(value_parser!(Feature))
+                                .action(clap::ArgAction::Append)
+                                .multiple_occurrences(true)
+                        )
+                )
                 .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
     let matches = cmd.get_matches();
@@ -194,6 +205,14 @@ fn main() -> std::io::Result<()> {
             Some(("remove", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
                 commands::mods::remove::remove(id);
+                Ok(())
+            }
+            Some(("deny", matches)) => {
+                let id: u128 = *matches.get_one("id").unwrap();
+                let features: Vec<Feature> = matches.get_many("perm").unwrap()
+                    .map(|perm: &Feature| perm.clone())
+                    .collect();
+                commands::mods::deny::deny(id, features);
                 Ok(())
             }
             Some(("allow", matches)) => {
