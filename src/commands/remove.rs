@@ -5,7 +5,7 @@ pub fn remove() {
     match super::ask_for_app(token.clone(), "delete") {
         Ok(app_id) => {
             let mut spinner = Spinner::new(Spinners::Flip, "Deleting your app".into());
-            match crate::entities::app::App::delete(token.clone(), app_id) {
+            match crate::entities::app::App::delete(token, app_id) {
                 Ok(()) => {
                     spinner
                         .stop_with_message(super::format_log("Your app was successfully nuked!"));

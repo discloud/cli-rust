@@ -1,6 +1,6 @@
 use crate::entities::moderator::Feature;
 use spinners::*;
-fn subtract_vecs<T>(v1: &Vec<T>, v2: &Vec<T>) -> Vec<T>
+fn subtract_vecs<T>(v1: &[T], v2: &[T]) -> Vec<T>
 where
     T: Eq + Clone,
 {
@@ -23,7 +23,7 @@ pub fn deny(id: u128, features: Vec<Feature>) {
             crate::handle_result!(
                 moderator.set_features(
                     subtract_vecs(&moderator.get_features(), &features),
-                    token.clone()
+                    token
                 ),
                 spinner
             );

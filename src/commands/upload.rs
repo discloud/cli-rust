@@ -58,10 +58,10 @@ where
             let mut f = File::open(path)?;
 
             f.read_to_end(&mut buffer)?;
-            zip.write_all(&*buffer)?;
+            zip.write_all(&buffer)?;
             buffer.clear();
             println!("{}", "✔".green().bold());
-        } else if name.as_os_str().len() != 0 {
+        } else if !name.as_os_str().is_empty() {
             zip.add_directory(name.to_str().unwrap(), options)?;
         }
     }
@@ -79,7 +79,7 @@ fn zip_dir_to_file(
     }
     let writer = File::create(dst_file).unwrap();
 
-    let walkdir = WalkDir::new(src_dir.to_string());
+    let walkdir = WalkDir::new(src_dir);
     let it = walkdir.into_iter();
 
     zip_dir(

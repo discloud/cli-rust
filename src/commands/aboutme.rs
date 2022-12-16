@@ -4,7 +4,7 @@ use colored::Colorize;
 #[tracing::instrument]
 pub fn aboutme() {
     let token = super::expect_token();
-    match crate::entities::user::fetch_user(token.clone()) {
+    match crate::entities::user::fetch_user(token) {
         Ok(user) => {
             println!("ID: {}", user.user_id.bright_black());
             println!("Plan: {}", color_plan(user.plan));

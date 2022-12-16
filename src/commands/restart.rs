@@ -5,7 +5,7 @@ pub fn restart() {
     match super::ask_for_app(token.clone(), "restart") {
         Ok(app_id) => {
             let mut spinner = Spinner::new(Spinners::Earth, "Restarting your app".into());
-            match crate::entities::app::App::restart(token.clone(), app_id) {
+            match crate::entities::app::App::restart(token, app_id) {
                 Ok(()) => {
                     spinner.stop_with_message(super::format_log("Your app is up!"));
                 }
