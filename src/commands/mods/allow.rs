@@ -16,7 +16,7 @@ pub fn allow(id: u128, features: Vec<Feature>) {
         Some(mut moderator) => {
             let mut feats = moderator.get_features();
             feats.append(&mut features.clone());
-            crate::handle_result!(moderator.set_features(feats, token.clone()), spinner);
+            crate::handle_result!(moderator.set_features(feats, token), spinner);
             spinner.stop_with_message(super::format_log(&format!(
                 "{:?} were added successfully!",
                 features

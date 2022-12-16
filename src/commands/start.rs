@@ -5,7 +5,7 @@ pub fn start() {
     match super::ask_for_app(token.clone(), "start") {
         Ok(app_id) => {
             let mut spinner = Spinner::new(Spinners::Earth, "Starting your app".into());
-            match crate::entities::app::App::start(token.clone(), app_id) {
+            match crate::entities::app::App::start(token, app_id) {
                 Ok(()) => {
                     spinner.stop_with_message(super::format_log("Your app is up!"));
                 }

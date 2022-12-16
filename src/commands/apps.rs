@@ -4,7 +4,7 @@ use crate::entities::FetchError;
 #[tracing::instrument]
 pub fn apps() {
     let token = super::expect_token();
-    match crate::entities::app::App::fetch_all(token.clone()) {
+    match crate::entities::app::App::fetch_all(token) {
         Ok(apps) => {
             println!("Your apps:");
             for app in apps {

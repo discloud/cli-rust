@@ -18,7 +18,7 @@ impl Display for FetchError {
             Self::APIReturnedError(status) => {
                 f.write_str(&format!("api returned code: {}", status))
             }
-            Self::FailedWithMessage(msg) => f.write_str(&msg),
+            Self::FailedWithMessage(msg) => f.write_str(msg),
         }
     }
 }

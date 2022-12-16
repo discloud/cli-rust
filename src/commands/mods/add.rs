@@ -16,7 +16,7 @@ pub fn add(id: u128) {
 
     let moderator = crate::handle_result!(
         Mod::new(
-            token.clone(),
+            token,
             id,
             app_id,
             vec![Feature::SeeLogs, Feature::Status]

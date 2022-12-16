@@ -16,7 +16,7 @@ pub fn remove(id: u128) {
     let app = handle_result!(App::fetch(token.clone(), app_id), spinner);
     let moderator = handle_result!(Mod::fetch_mod(token.clone(), id, app_id), spinner);
     if let Some(moderator) = moderator {
-        handle_result!(moderator.remove(token.clone()), spinner);
+        handle_result!(moderator.remove(token), spinner);
         spinner.stop_with_message(super::format_log(&format!(
             "{} was removed from your app!",
             id

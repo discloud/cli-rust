@@ -41,7 +41,7 @@ use crate::entities::FetchError;
 pub fn expect_token() -> String {
     if crate::auth::validate_token() {
         log("Your token is valid!");
-        return crate::auth::get_token().unwrap();
+        crate::auth::get_token().unwrap()
     } else {
         err("Your token is invalid!");
         std::process::exit(1);
@@ -81,21 +81,21 @@ mod tests {
 
     #[test]
     fn log() {
-        let mut out = String::from("✔".green().bold().to_string());
+        let mut out = "✔".green().bold().to_string();
         out.push_str(" Some logs");
         assert_eq!(super::format_log("Some logs"), out)
     }
 
     #[test]
     fn err() {
-        let mut out = String::from("✘".red().bold().to_string());
+        let mut out = "X".red().bold().to_string();
         out.push_str(" Some errors");
         assert_eq!(super::format_err("Some errors"), out)
     }
 
     #[test]
     fn warn() {
-        let mut out = String::from("!".yellow().bold().to_string());
+        let mut out = "!".yellow().bold().to_string();
         out.push_str(" Some warnings");
         assert_eq!(super::format_warn("Some warnings"), out)
     }
