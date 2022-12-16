@@ -12,7 +12,7 @@ jobs:
         with: 
           toolchain: stable
       - name: Run clippy
-        run: cargo clippy
+        run: cargo clippy -- -D warnings
   build:
     name: Build on ${{ matrix.target }}
     runs-on: ${{ matrix.target }}
