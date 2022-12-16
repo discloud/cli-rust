@@ -23,8 +23,8 @@ fn main() -> std::io::Result<()> {
         .init();
     fn parse_feature(feature: &str) -> Result<Feature, String> {
         match feature {
-            "start" => Ok(Feature::Start),    
-            "stop" => Ok(Feature::Stop), 
+            "start" => Ok(Feature::Start),
+            "stop" => Ok(Feature::Stop),
             "restart" => Ok(Feature::Restart),
             "logs" => Ok(Feature::SeeLogs),
             "commit" => Ok(Feature::Commit),
@@ -38,11 +38,7 @@ fn main() -> std::io::Result<()> {
         "https://0512a7bb28624cfc848cdad08f2186a7@sentry.discloudbot.com/3",
         sentry::ClientOptions {
             release: sentry::release_name!(),
-            traces_sample_rate: if cfg!(debug_assertions) {
-                1.0
-            } else {
-                0.2
-            },
+            traces_sample_rate: if cfg!(debug_assertions) { 1.0 } else { 0.2 },
             ..Default::default()
         },
     ));
@@ -126,6 +122,18 @@ fn main() -> std::io::Result<()> {
                 .alias("user")
         )
         .subcommand(
+            Command::new("teams")
+            .about("Allows to interact with other people's bots, you can use this once someone adds you as a moderator.")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .subcommand(
+                Command::new("apps")
+                    .about("Shows all bots you have access to.")
+                    .alias("ls")
+                    .alias("list")
+            )
+        )
+        .subcommand(
             Command::new("mods")
                 .about("Manages your apps' mods")
                 .subcommand_required(true)
@@ -152,7 +160,6 @@ fn main() -> std::io::Result<()> {
                             Arg::new("perm")
                                 .value_parser(parse_feature)
                                 .action(clap::ArgAction::Append)
-                                .min_values(1)
                                 .required(true)
                         )
                 )
@@ -163,7 +170,6 @@ fn main() -> std::io::Result<()> {
                             Arg::new("perm")
                                 .value_parser(parse_feature)
                                 .action(clap::ArgAction::Append)
-                                .min_values(1)
                                 .required(true)
                         )
                         .arg(Arg::new("to").value_parser(["to"]).action(clap::ArgAction::Set).required(true))
@@ -227,22 +233,34 @@ fn main() -> std::io::Result<()> {
             }
             Some(("deny", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
-                let features: Vec<Feature> = matches.get_many("perm").unwrap()
-                    .map(|perm: &Feature| perm.clone())
-                    .collect();
+                let features: Vec<Feature> = matches.get_many("perm").unwrap().cloned().collect();
                 commands::mods::deny::deny(id, features);
                 Ok(())
             }
             Some(("allow", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
-                let features: Vec<Feature> = matches.get_many("perm").unwrap()
-                    .map(|perm: &Feature| perm.clone())
-                    .collect();
+                let features: Vec<Feature> = matches.get_many("perm").unwrap().cloned().collect();
                 commands::mods::allow::allow(id, features);
                 Ok(())
             }
-            _ => panic!(),
+            cmd => {
+                eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
+                Ok(())
+            }
         },
-        _ => panic!(),
+        Some(("teams", matches)) => match matches.subcommand() {
+            Some(("apps", _)) => {
+                commands::teams::apps::apps();
+                Ok(())
+            }
+            cmd => {
+                eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
+                Ok(())
+            }
+        },
+        cmd => {
+            eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
+            Ok(())
+        }
     }
 }

@@ -46,7 +46,6 @@ pub struct Mod {
     app_id: u128,
 }
 impl Mod {
-    #[tracing::instrument]
     pub fn new(
         token: String,
         user_id: u128,
@@ -65,7 +64,6 @@ impl Mod {
     pub fn id(&self) -> u128 {
         self.user_id.parse().unwrap()
     }
-    #[tracing::instrument]
     pub fn set_features(
         &mut self,
         permissions: Vec<Feature>,
@@ -96,7 +94,6 @@ impl Mod {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn fetch_mod(
         token: String,
         user_id: u128,
@@ -140,7 +137,6 @@ impl Mod {
         self.features.clone()
     }
     /// Adds this moderator to the app
-    #[tracing::instrument]
     pub fn add(&self, token: String) -> Result<(), FetchError> {
         #[derive(Deserialize)]
         struct Response {
@@ -167,7 +163,6 @@ impl Mod {
         }
     }
 
-    #[tracing::instrument]
     pub fn remove(self, token: String) -> Result<(), FetchError> {
         #[derive(Deserialize)]
         struct Response {

@@ -14,12 +14,10 @@ pub fn restart() {
                     std::process::exit(1);
                 }
             }
-            
         }
         Err(err) => {
             super::err(&format!("Couldn't fetch apps from api: {}", err));
             std::process::exit(1);
         }
     }
-    
 }

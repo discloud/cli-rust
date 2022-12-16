@@ -4,9 +4,9 @@ use crate::entities::FetchError;
 #[tracing::instrument]
 pub fn apps() {
     let token = super::expect_token();
-    match crate::entities::app::App::fetch_all(token.clone()) {
+    match crate::entities::app::App::fetch_foreign_apps(token) {
         Ok(apps) => {
-            println!("Your apps:");
+            println!("(Not) Your apps:");
             for app in apps {
                 println!(
                     "- {}: ({}) {}",
@@ -18,7 +18,7 @@ pub fn apps() {
         }
         Err(err) => match err {
             FetchError::APIReturnedError(code) => match code {
-                404 => super::err("You don't have any apps. Use `discloud up` to upload one."),
+                404 => super::err("No one gave you permission to do stuff on their apps."),
                 _ => {
                     super::err(&err.to_string());
                 }

@@ -14,7 +14,21 @@ pub struct App {
     pub lang: String,
 }
 impl App {
-    #[tracing::instrument]
+    // Fetches apps from /team instead of /app/all
+    pub fn fetch_foreign_apps(token: String) -> Result<Vec<App>, FetchError> {
+        #[derive(Deserialize)]
+        struct AppsResponse {
+            pub apps: Vec<App>,
+        }
+        let client = reqwest::blocking::Client::new();
+        let req = client
+            .get(crate::api_url!("/team"))
+            .header("api-token", token);
+        match req.send() {
+            Ok(res) => Ok(res.json::<AppsResponse>().unwrap().apps),
+            Err(err) => Err(FetchError::FailedToConnect(err)),
+        }
+    }
     pub fn fetch_all(token: String) -> Result<Vec<App>, FetchError> {
         #[derive(Deserialize)]
         struct AppsResponse {
@@ -35,7 +49,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn fetch(token: String, id: u128) -> Result<App, FetchError> {
         #[derive(Deserialize)]
         struct AppResponse {
@@ -56,7 +69,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn get_logs(token: String, id: u128) -> Result<String, FetchError> {
         #[derive(Deserialize)]
         struct Terminal {
@@ -91,7 +103,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn restart(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
@@ -108,7 +119,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn start(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
@@ -125,7 +135,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn stop(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
@@ -142,7 +151,6 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    #[tracing::instrument]
     pub fn delete(token: String, id: u128) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client

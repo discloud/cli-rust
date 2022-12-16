@@ -10,6 +10,7 @@ pub mod remove;
 pub mod restart;
 pub mod start;
 pub mod stop;
+pub mod teams;
 pub mod upload;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
