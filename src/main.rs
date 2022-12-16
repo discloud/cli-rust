@@ -155,7 +155,6 @@ fn main() -> std::io::Result<()> {
                         .about("Gives permissions to a moderator")
                         .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set)
                                 .required(true))
-                        .arg(Arg::new("to").value_parser(["to"]).action(clap::ArgAction::Set).required(true))                        
                         .arg(
                             Arg::new("perm")
                                 .value_parser(parse_feature)
@@ -166,15 +165,14 @@ fn main() -> std::io::Result<()> {
                 .subcommand(
                     Command::new("deny")
                         .about("Removes permissions from a moderator")
+                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set)
+                                .required(true))
                         .arg(
                             Arg::new("perm")
                                 .value_parser(parse_feature)
                                 .action(clap::ArgAction::Append)
                                 .required(true)
                         )
-                        .arg(Arg::new("to").value_parser(["to"]).action(clap::ArgAction::Set).required(true))
-                        .arg(Arg::new("id").value_parser(value_parser!(u128)).action(clap::ArgAction::Set)
-                                .required(true))
                 )
                 .after_help("Be careful with what people you add and what permissions you give: With Great Power comes Great Responsability.")
         );
