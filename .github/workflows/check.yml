@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup Rust
-        use: actions-rust-lang/setup-rust-toolchain@v1.3.1
+        uses: actions-rust-lang/setup-rust-toolchain@v1.3.1
         with: 
           toolchain: stable
       - name: Run clippy
