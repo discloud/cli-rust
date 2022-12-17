@@ -3,7 +3,7 @@ use serde::Deserialize;
 use super::FetchError;
 
 #[derive(Deserialize, Debug)]
-pub struct UserDate {
+pub struct TimeLeft {
     pub days: u32,
     pub hours: u32,
     pub minutes: u32,
@@ -25,9 +25,9 @@ pub struct User {
     pub plan: String,
     pub locale: String,
     #[serde(rename = "planDataEnd")]
-    pub plan_data_end: chrono::DateTime<chrono::Utc>,
+    pub plan_data_end: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(rename = "lastDataLeft")]
-    pub last_data_left: UserDate,
+    pub last_data_left: Option<TimeLeft>,
 }
 #[tracing::instrument]
 pub fn fetch_user(token: String) -> Result<User, FetchError> {

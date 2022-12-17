@@ -8,19 +8,22 @@ pub fn aboutme() {
         Ok(user) => {
             println!("ID: {}", user.user_id.bright_black());
             println!("Plan: {}", color_plan(user.plan));
-            let end_date = user.plan_data_end;
-            println!(
-                "Your plan ends at: {}/{}/{} {}:{}",
-                end_date.day(),
-                end_date.month(),
-                end_date.year(),
-                end_date.hour(),
-                end_date.minute()
-            );
-            println!(
-                "  Which means you have {} days left!",
-                user.last_data_left.days.to_string().green().bold()
-            );
+            if let Some(end_date) = user.plan_data_end {
+                println!(
+                    "Your plan ends at: {}/{}/{} {}:{}",
+                    end_date.day(),
+                    end_date.month(),
+                    end_date.year(),
+                    end_date.hour(),
+                    end_date.minute()
+                );   
+            }
+            if let Some(time_left) = user.last_data_left{
+                println!(
+                    "  Which means you have {} days left!",
+                    time_left.days.to_string().green().bold()
+                );
+            }
             println!("Memory:");
             println!(
                 "  Total: {}{}",
