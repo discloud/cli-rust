@@ -16,9 +16,9 @@ fn get_zip_file_path() -> PathBuf {
     dst_file
 }
 #[tracing::instrument]
-pub fn commit() {
+pub fn commit(teams: bool) {
     let token = super::expect_token();
-    let app_id = match super::ask_for_app(token.clone(), "commit") {
+    let app_id = match super::ask_for_app(token.clone(), "commit", teams) {
         Ok(app_id) => app_id,
         Err(error) => {
             super::err(&format!("Couldn't fetch apps: {}", error));
@@ -33,8 +33,8 @@ pub fn commit() {
         Err(e) => super::err(&format!("Failed to zip: {:?}", e)),
     }
     let mut spinner = Spinner::new(spinners::Spinners::Earth, "Committing app...".to_string());
-    let msg = match upload_zip(token, app_id) {
-        Ok(()) => super::format_log("Your app was successfully commited!"),
+    let msg = match upload_zip(token, app_id, teams) {
+        Ok(()) => if !teams {super::format_log("Your app was updated successfully!")} else {super::format_log("Your buddy's app was updated!")},
         Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
@@ -115,7 +115,7 @@ fn zip_dir_to_file(
     Ok(())
 }
 #[tracing::instrument]
-fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
+fn upload_zip(token: String, app_id: u128, teams: bool) -> Result<(), String> {
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
     let client = reqwest::blocking::Client::builder()
@@ -127,7 +127,7 @@ fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),
         Ok(form) => {
             let req = client
-                .put(crate::api_url!(format!("/app/{}/commit", app_id)))
+                .put(crate::api_url!(format!("/{}/{}/commit", if teams {"team"} else {"app"}, app_id)))
                 .multipart(form)
                 .header("api-token", token);
             let res = req.send();

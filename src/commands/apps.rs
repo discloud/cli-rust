@@ -2,11 +2,11 @@ use colored::Colorize;
 
 use crate::entities::FetchError;
 #[tracing::instrument]
-pub fn apps() {
+pub fn apps(teams: bool) {
     let token = super::expect_token();
-    match crate::entities::app::App::fetch_all(token) {
+    match if !teams {crate::entities::app::App::fetch_all(token)} else {crate::entities::app::App::fetch_foreign_apps(token)} {
         Ok(apps) => {
-            println!("Your apps:");
+            println!("{}Your apps:", if teams{"(Not) "} else {""});
             for app in apps {
                 println!(
                     "- {}: ({}) {}",

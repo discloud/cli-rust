@@ -1,11 +1,11 @@
 use spinners::*;
 #[tracing::instrument]
-pub fn start() {
+pub fn start(teams: bool) {
     let token = super::expect_token();
-    match super::ask_for_app(token.clone(), "start") {
+    match super::ask_for_app(token.clone(), "start", teams) {
         Ok(app_id) => {
             let mut spinner = Spinner::new(Spinners::Earth, "Starting your app".into());
-            match crate::entities::app::App::start(token, app_id) {
+            match crate::entities::app::App::start(token, app_id, teams) {
                 Ok(()) => {
                     spinner.stop_with_message(super::format_log("Your app is up!"));
                 }

@@ -8,7 +8,7 @@ use crate::{
 #[tracing::instrument]
 pub fn remove(id: u128) {
     let token = expect_token();
-    let app_id = handle_result!(ask_for_app(token.clone(), "remove the moderator"));
+    let app_id = handle_result!(ask_for_app(token.clone(), "remove the moderator", false));
     let mut spinner = Spinner::new(
         spinners::Spinners::Moon,
         format!("Sending {} to the moon", id),

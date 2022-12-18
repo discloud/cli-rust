@@ -132,6 +132,35 @@ fn main() -> std::io::Result<()> {
                     .alias("ls")
                     .alias("list")
             )
+            .subcommand(
+                Command::new("start")
+                    .about("Starts a stopped app.")
+            )
+            .subcommand(
+                Command::new("restart")
+                    .about("Restarts an app.")
+                    .alias("reboot")
+                    .alias("r")
+            )
+            .subcommand(
+                Command::new("logs")
+                    .about("Prints logs of an app.")
+                    .alias("terminal")
+                    .alias("t")
+            )
+                
+            .subcommand(
+                Command::new("stop")
+                    .about("Stops an app.")
+                    .alias("shutdown")
+                    .alias("down")
+            )
+            
+            .subcommand(
+                Command::new("commit")
+                    .about("Commits to an app on discloud. If you have more than one shared app, it will ask which app you want to commit to.")
+                    .alias("c")
+            )
         )
         .subcommand(
             Command::new("mods")
@@ -186,7 +215,7 @@ fn main() -> std::io::Result<()> {
             Ok(())
         }
         Some(("commit", _)) => {
-            commands::commit::commit();
+            commands::commit::commit(false);
             Ok(())
         }
         Some(("remove", _)) => {
@@ -194,24 +223,24 @@ fn main() -> std::io::Result<()> {
             Ok(())
         }
         Some(("apps", _)) => {
-            commands::apps::apps();
+            commands::apps::apps(false);
             Ok(())
         }
         Some(("stop", _)) => {
-            commands::stop::stop();
+            commands::stop::stop(false);
             Ok(())
         }
 
         Some(("start", _)) => {
-            commands::start::start();
+            commands::start::start(false);
             Ok(())
         }
         Some(("restart", _)) => {
-            commands::restart::restart();
+            commands::restart::restart(false);
             Ok(())
         }
         Some(("logs", _)) => {
-            commands::logs::logs();
+            commands::logs::logs(false);
             Ok(())
         }
         Some(("aboutme", _)) => {
@@ -247,8 +276,30 @@ fn main() -> std::io::Result<()> {
             }
         },
         Some(("teams", matches)) => match matches.subcommand() {
+            Some(("commit", _)) => {
+                commands::commit::commit(true);
+                Ok(())
+            }
             Some(("apps", _)) => {
-                commands::teams::apps::apps();
+                commands::apps::apps(true);
+                Ok(())
+            }
+
+            Some(("stop", _)) => {
+                commands::stop::stop(true);
+                Ok(())
+            }
+                
+            Some(("start", _)) => {
+                commands::start::start(true);
+                Ok(())
+            }
+            Some(("restart", _)) => {
+                commands::restart::restart(true);
+                Ok(())
+            }
+            Some(("logs", _)) => {
+                commands::logs::logs(true);
                 Ok(())
             }
             cmd => {

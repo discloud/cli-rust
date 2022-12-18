@@ -4,7 +4,8 @@ pub fn allow(id: u128, features: Vec<Feature>) {
     let token = super::expect_token();
     let app_id = crate::handle_result!(super::ask_for_app(
         token.clone(),
-        "modify the mod's permissions"
+        "modify the mod's permissions",
+        false
     ));
     let mut spinner = Spinner::new(Spinners::Pong, "Adding the permissions...".into());
     let moderator = crate::handle_result!(crate::entities::moderator::Mod::fetch_mod(

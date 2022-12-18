@@ -10,7 +10,6 @@ pub mod remove;
 pub mod restart;
 pub mod start;
 pub mod stop;
-pub mod teams;
 pub mod upload;
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
@@ -100,16 +99,19 @@ mod tests {
         assert_eq!(super::format_warn("Some warnings"), out)
     }
 }
-pub fn ask_for_app(token: String, action: &str) -> Result<u128, FetchError> {
-    let user = crate::entities::user::fetch_user(token.clone())?;
-    match user.apps.len() {
+pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<u128, FetchError> {
+    let apps = if teams {
+        crate::entities::app::App::fetch_foreign_apps(token)
+    } else {
+        crate::entities::app::App::fetch_all(token)
+    }?;
+    match apps.len() {
         0 => {
-            err("You don't have any apps. Use `discloud up` to upload one.");
-            std::process::exit(1)
-        }
-        1 => Ok(user.apps[0].parse().unwrap()),
+            format_err("You don't have any apps!");
+            std::process::exit(1);
+        },
+        1 => Ok(apps[0].id.parse().unwrap()),
         _ => {
-            let apps = crate::entities::app::App::fetch_all(token)?;
             let options = apps
                 .iter()
                 .map(|app| format!("{}: ({}) {}", app.name, app.lang, app.id))

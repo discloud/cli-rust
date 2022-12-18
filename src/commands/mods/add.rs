@@ -8,7 +8,7 @@ use crate::{
 #[tracing::instrument]
 pub fn add(id: u128) {
     let token = expect_token();
-    let app_id = crate::handle_result!(ask_for_app(token.clone(), "add a moderator"));
+    let app_id = crate::handle_result!(ask_for_app(token.clone(), "add a moderator", false));
     let mut spinner = Spinner::new(
         spinners::Spinners::Bounce,
         format!("Adding {} as a moderator", id),

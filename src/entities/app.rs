@@ -1,16 +1,11 @@
 use super::*;
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct App {
     pub name: String,
     pub id: String,
     pub online: bool,
-    #[serde(rename = "ramKilled")]
-    pub ram_killed: bool,
-    pub ram: u64,
-    #[serde(rename = "mainFile")]
-    pub main_file: String,
     pub lang: String,
 }
 impl App {
@@ -69,7 +64,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn get_logs(token: String, id: u128) -> Result<String, FetchError> {
+    pub fn get_logs(token: String, id: u128, team: bool) -> Result<String, FetchError> {
         #[derive(Deserialize)]
         struct Terminal {
             big: String,
@@ -84,7 +79,7 @@ impl App {
         }
         let client = reqwest::blocking::Client::new();
         let req = client
-            .get(crate::api_url!(format!("/app/{}/logs", id)))
+            .get(crate::api_url!(format!("/{}/{}/logs", if team {"team"} else {"app"}, id)))
             .header("api-token", token);
         match req.send() {
             Ok(res) => {
@@ -103,10 +98,10 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn restart(token: String, id: u128) -> Result<(), FetchError> {
+    pub fn restart(token: String, id: u128, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
-            .put(crate::api_url!(format!("/app/{}/restart", id)))
+            .put(crate::api_url!(format!("/{}/{}/restart", if team {"team"} else {"app"}, id)))
             .header("api-token", token);
         match req.send() {
             Ok(res) => {
@@ -119,10 +114,10 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn start(token: String, id: u128) -> Result<(), FetchError> {
+    pub fn start(token: String, id: u128, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
-            .put(crate::api_url!(format!("/app/{}/start", id)))
+            .put(crate::api_url!(format!("/{}/{}/start", if team {"team"} else {"app"}, id)))
             .header("api-token", token);
         match req.send() {
             Ok(res) => {
@@ -135,10 +130,10 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn stop(token: String, id: u128) -> Result<(), FetchError> {
+    pub fn stop(token: String, id: u128, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
-            .put(crate::api_url!(format!("/app/{}/stop", id)))
+            .put(crate::api_url!(format!("/{}/{}/stop", if team {"team"} else {"app"}, id)))
             .header("api-token", token);
         match req.send() {
             Ok(res) => {
