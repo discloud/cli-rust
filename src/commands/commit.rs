@@ -18,7 +18,7 @@ fn get_zip_file_path() -> PathBuf {
 #[tracing::instrument]
 pub fn commit(teams: bool) {
     let token = super::expect_token();
-    let app_id = match super::ask_for_app(token.clone(), "commit", teams) {
+    let app_id = match super::ask_for_app_id(token.clone(), "commit", teams) {
         Ok(app_id) => app_id,
         Err(error) => {
             super::err(&format!("Couldn't fetch apps: {}", error));

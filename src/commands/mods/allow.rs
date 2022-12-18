@@ -2,7 +2,7 @@ use crate::entities::moderator::Feature;
 use spinners::*;
 pub fn allow(id: u128, features: Vec<Feature>) {
     let token = super::expect_token();
-    let app_id = crate::handle_result!(super::ask_for_app(
+    let app_id = crate::handle_result!(super::ask_for_app_id(
         token.clone(),
         "modify the mod's permissions",
         false

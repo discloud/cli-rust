@@ -2,6 +2,7 @@ pub mod aboutme;
 pub mod apps;
 pub mod authstatus;
 pub mod commit;
+pub mod status;
 pub mod init;
 pub mod login;
 pub mod logs;
@@ -35,7 +36,7 @@ macro_rules! handle_result {
         }
     };
 }
-use crate::entities::FetchError;
+use crate::entities::{FetchError, app::App};
 #[tracing::instrument]
 pub fn expect_token() -> String {
     if crate::auth::validate_token() {
@@ -99,7 +100,35 @@ mod tests {
         assert_eq!(super::format_warn("Some warnings"), out)
     }
 }
-pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<u128, FetchError> {
+
+pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<App, FetchError> {
+    let mut apps = if teams {
+        crate::entities::app::App::fetch_foreign_apps(token)
+    } else {
+        crate::entities::app::App::fetch_all(token)
+    }?;
+    match apps.len() {
+        0 => {
+            err("You don't have any apps!");
+            std::process::exit(1);
+        },
+        1 => Ok(apps.remove(0)),
+        _ => {
+            let options = apps
+                .iter()
+                .map(|app| format!("{}: ({}) {}", app.name, app.lang, app.id))
+                .collect::<Vec<_>>();
+            let chosen_opt = Select::with_theme(&ColorfulTheme::default())
+                .items(&options)
+                .with_prompt(format!("Which app you want to {}?", action))
+                .interact()
+                .unwrap();
+            Ok(apps.remove(chosen_opt))
+        }
+    }
+}
+
+pub fn ask_for_app_id(token: String, action: &str, teams: bool) -> Result<u128, FetchError> {
     let apps = if teams {
         crate::entities::app::App::fetch_foreign_apps(token)
     } else {
@@ -107,7 +136,7 @@ pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<u128, Fet
     }?;
     match apps.len() {
         0 => {
-            format_err("You don't have any apps!");
+            err("You don't have any apps!");
             std::process::exit(1);
         },
         1 => Ok(apps[0].id.parse().unwrap()),

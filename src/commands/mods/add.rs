@@ -1,14 +1,14 @@
 use spinners::Spinner;
 
 use crate::{
-    commands::{ask_for_app, expect_token},
+    commands::{ask_for_app_id, expect_token},
     entities::moderator::{Feature, Mod},
 };
 
 #[tracing::instrument]
 pub fn add(id: u128) {
     let token = expect_token();
-    let app_id = crate::handle_result!(ask_for_app(token.clone(), "add a moderator", false));
+    let app_id = crate::handle_result!(ask_for_app_id(token.clone(), "add a moderator", false));
     let mut spinner = Spinner::new(
         spinners::Spinners::Bounce,
         format!("Adding {} as a moderator", id),
