@@ -1,9 +1,8 @@
 [package]
 name = "discloud"
-rust-version = "1.63.0"
 authors = ["coffee-is-power"]
 repository = "https://github.com/discloud/cli-rust/"
-version = "0.3.2-alpha"
+version = "0.4.1-alpha"
 edition = "2021"
 description = "Blazingly fast Discloud CLI"
 license = "Apache-2.0"

@@ -444,7 +444,7 @@ dependencies = [
 
 [[package]]
 name = "discloud"
-version = "0.3.2-alpha"
+version = "0.4.1-alpha"
 dependencies = [
  "chrono",
  "clap",
