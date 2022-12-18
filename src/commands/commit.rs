@@ -9,14 +9,16 @@ use zip::write::FileOptions;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
+#[tracing::instrument]
 fn get_zip_file_path() -> PathBuf {
     let mut dst_file = std::env::temp_dir();
     dst_file.push("discloud.zip");
     dst_file
 }
-pub fn commit() {
+#[tracing::instrument]
+pub fn commit(teams: bool) {
     let token = super::expect_token();
-    let app_id = match super::ask_for_app(token.clone(), "commit") {
+    let app_id = match super::ask_for_app_id(token.clone(), "commit", teams) {
         Ok(app_id) => app_id,
         Err(error) => {
             super::err(&format!("Couldn't fetch apps: {}", error));
@@ -31,8 +33,8 @@ pub fn commit() {
         Err(e) => super::err(&format!("Failed to zip: {:?}", e)),
     }
     let mut spinner = Spinner::new(spinners::Spinners::Earth, "Committing app...".to_string());
-    let msg = match upload_zip(token, app_id) {
-        Ok(()) => super::format_log("Your app was successfully commited!"),
+    let msg = match upload_zip(token, app_id, teams) {
+        Ok(()) => if !teams {super::format_log("Your app was updated successfully!")} else {super::format_log("Your buddy's app was updated!")},
         Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
@@ -64,10 +66,10 @@ where
             let mut f = File::open(path)?;
 
             f.read_to_end(&mut buffer)?;
-            zip.write_all(&*buffer)?;
+            zip.write_all(&buffer)?;
             buffer.clear();
             println!("{}", "✔".green().bold());
-        } else if name.as_os_str().len() != 0 {
+        } else if !name.as_os_str().is_empty() {
             zip.add_directory(name.to_str().unwrap(), options)?;
         }
     }
@@ -75,6 +77,7 @@ where
     Result::Ok(())
 }
 
+#[tracing::instrument]
 fn zip_dir_to_file(
     src_dir: &str,
     dst_file: &str,
@@ -85,7 +88,7 @@ fn zip_dir_to_file(
     }
     let writer = File::create(dst_file).unwrap();
 
-    let walkdir = WalkDir::new(src_dir.to_string());
+    let walkdir = WalkDir::new(src_dir);
     let it = walkdir.into_iter();
 
     zip_dir(
@@ -111,16 +114,20 @@ fn zip_dir_to_file(
 
     Ok(())
 }
-fn upload_zip(token: String, app_id: u128) -> Result<(), String> {
+#[tracing::instrument]
+fn upload_zip(token: String, app_id: u128, teams: bool) -> Result<(), String> {
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
-    let client = reqwest::blocking::Client::builder().timeout(None).build().unwrap();
+    let client = reqwest::blocking::Client::builder()
+        .timeout(None)
+        .build()
+        .unwrap();
     let form = reqwest::blocking::multipart::Form::new().file("file", file_path);
     match form {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),
         Ok(form) => {
             let req = client
-                .put(crate::api_url!(format!("/app/{}/commit", app_id)))
+                .put(crate::api_url!(format!("/{}/{}/commit", if teams {"team"} else {"app"}, app_id)))
                 .multipart(form)
                 .header("api-token", token);
             let res = req.send();
