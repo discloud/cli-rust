@@ -1,13 +1,12 @@
 use crate::auth;
 use std::io::ErrorKind;
+#[tracing::instrument]
 pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
         Ok(token) => {
             super::log("You're already logged in!\n");
             let mut stars = String::new();
-            for _ in 0..token.len() - 5 {
-                stars.push('*');
-            }
+            stars.push_str(&"*".repeat(token.len() - 5));
             super::log(&format!("Token: {}{}", &token[..5], stars));
             super::check_token();
         }

@@ -1,11 +1,12 @@
 use spinners::{Spinner, Spinners};
 
-pub fn logs(){
+#[tracing::instrument]
+pub fn logs(teams: bool) {
     let token = super::expect_token();
-    match super::ask_for_app(token.clone(), "show the logs") {
+    match super::ask_for_app_id(token.clone(), "show the logs", teams) {
         Ok(app_id) => {
             let mut spinner = Spinner::new(Spinners::Bounce, "Downloading the logs".into());
-            match crate::entities::app::App::get_logs(token.clone(), app_id) {
+            match crate::entities::app::App::get_logs(token, app_id, teams) {
                 Ok(logs) => {
                     spinner.stop_with_message(logs);
                 }
@@ -14,7 +15,6 @@ pub fn logs(){
                     std::process::exit(1);
                 }
             }
-            
         }
         Err(err) => {
             super::err(&format!("Couldn't fetch apps from api: {}", err));

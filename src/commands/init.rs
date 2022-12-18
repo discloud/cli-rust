@@ -1,7 +1,7 @@
 use dialoguer::{theme::ColorfulTheme, Select};
 
 fn vec_from_str(s: String) -> Vec<String> {
-    s.split(",").map(|s| s.trim().into()).collect()
+    s.split(',').map(|s| s.trim().into()).collect()
 }
 
 #[derive(Default)]
@@ -25,7 +25,7 @@ impl App {
     fn get_config(&self) -> String {
         match &self.typ {
             AppTyp::Site => {
-                if self.apt.len() > 0 {
+                if !self.apt.is_empty() {
                     format!(
                         "ID={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=site\nVERSION=latest",
                         self.subdomain,
@@ -42,7 +42,7 @@ impl App {
                 }
             }
             AppTyp::Bot => {
-                if self.apt.len() > 0 {
+                if !self.apt.is_empty() {
                     format!("NAME={}\nAVATAR={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nAPT={}\nTYPE=bot\nVERSION=latest", self.name, self.avatar, self.main, self.autorestart, self.ram, self.apt.join(","))
                 } else {
                     format!("NAME={}\nAVATAR={}\nMAIN={}\nAUTORESTART={}\nRAM={}\nTYPE=bot\nVERSION=latest", self.name,self.avatar, self.main, self.autorestart, self.ram)
@@ -51,6 +51,7 @@ impl App {
         }
     }
 }
+#[tracing::instrument]
 pub fn init() -> std::io::Result<()> {
     use dialoguer::Input;
     if std::path::Path::new("discloud.config").exists() {
@@ -59,7 +60,7 @@ pub fn init() -> std::io::Result<()> {
     let typ = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Type")
         .default(0)
-        .items(&vec!["Bot", "Site"])
+        .items(&["Bot", "Site"])
         .interact()?;
     let mut app: App = Default::default();
     match typ {
@@ -95,7 +96,7 @@ pub fn init() -> std::io::Result<()> {
         .with_prompt("APT Packages")
         .allow_empty(true)
         .interact_text()?;
-    if apt.len() > 0 {
+    if !apt.is_empty() {
         app.apt = vec_from_str(apt);
     }
     std::fs::write("discloud.config", app.get_config())?;

@@ -15,6 +15,7 @@ fn get_zip_file_path() -> PathBuf {
     dst_file.push("discloud.zip");
     dst_file
 }
+#[tracing::instrument]
 pub fn upload() {
     let token = super::expect_token();
     let src_dir = ".";
@@ -57,10 +58,10 @@ where
             let mut f = File::open(path)?;
 
             f.read_to_end(&mut buffer)?;
-            zip.write_all(&*buffer)?;
+            zip.write_all(&buffer)?;
             buffer.clear();
             println!("{}", "✔".green().bold());
-        } else if name.as_os_str().len() != 0 {
+        } else if !name.as_os_str().is_empty() {
             zip.add_directory(name.to_str().unwrap(), options)?;
         }
     }
@@ -78,7 +79,7 @@ fn zip_dir_to_file(
     }
     let writer = File::create(dst_file).unwrap();
 
-    let walkdir = WalkDir::new(src_dir.to_string());
+    let walkdir = WalkDir::new(src_dir);
     let it = walkdir.into_iter();
 
     zip_dir(
@@ -109,11 +110,14 @@ fn upload_zip(token: String) -> Result<(), String> {
     struct UploadResponse {
         status: String,
         message: Option<String>,
-        logs: Option<String>
+        logs: Option<String>,
     }
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
-    let client = reqwest::blocking::Client::builder().timeout(None).build().unwrap();
+    let client = reqwest::blocking::Client::builder()
+        .timeout(None)
+        .build()
+        .unwrap();
     let form = reqwest::blocking::multipart::Form::new().file("file", file_path);
     match form {
         Err(err) => Err(format!("Couldn't open zip file: {}", err)),
@@ -130,14 +134,22 @@ fn upload_zip(token: String) -> Result<(), String> {
                     let res: UploadResponse = res.json().unwrap();
                     if res.status == "error" {
                         if let Some(logs) = res.logs {
-                            Err(format!("Upload failed: API Returned {}: {}\nLogs:\n{}", status.as_u16(), res.message.unwrap(), logs))
+                            Err(format!(
+                                "Upload failed: API Returned {}: {}\nLogs:\n{}",
+                                status.as_u16(),
+                                res.message.unwrap(),
+                                logs
+                            ))
                         } else {
-                            Err(format!("Upload failed: API Returned {}: {}", status.as_u16(), res.message.unwrap()))
+                            Err(format!(
+                                "Upload failed: API Returned {}: {}",
+                                status.as_u16(),
+                                res.message.unwrap()
+                            ))
                         }
                     } else {
                         Ok(())
                     }
-                    
                 }
             }
         }
