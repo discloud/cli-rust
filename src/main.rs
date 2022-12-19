@@ -53,6 +53,7 @@ fn main() -> std::io::Result<()> {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .author("Tiago Dinis")
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand(
             Command::new("login")
                 .about("Sets the Discloud API token, use .api command on #commands to generate one")
