@@ -2,7 +2,7 @@
 name = "discloud"
 authors = ["coffee-is-power"]
 repository = "https://github.com/discloud/cli-rust/"
-version = "0.4.1-alpha"
+version = "1.0.0"
 edition = "2021"
 description = "Blazingly fast Discloud CLI"
 license = "Apache-2.0"
@@ -19,7 +19,7 @@ directories = "4.0.1"
 reqwest = { version = "0.11.12", features = ["blocking", "json", "multipart", "rustls-tls"], default-features=false }
 sentry = { version = "0.29.1", default-features = false, features = ["rustls", "reqwest", "tracing", "panic"] }
 serde = { version = "1.0.151", features = ["derive"] }
-serde-enum-str = "0.2.5"
+serde-enum-str = "0.3.2"
 spinners = "4.1.0"
 tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15" }
