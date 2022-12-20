@@ -26,7 +26,7 @@ pub fn upload() {
     }
     let mut spinner = Spinner::new(spinners::Spinners::Earth, "Uploading app...".to_string());
     let msg = match upload_zip(token) {
-        Ok(()) => super::format_log("Your app was successfully uploaded!"),
+        Ok(()) => super::format_confetti("Your app was successfully uploaded!"),
         Err(err) => super::format_err(&err),
     };
     spinner.stop_with_message(msg);
@@ -60,7 +60,7 @@ where
             f.read_to_end(&mut buffer)?;
             zip.write_all(&buffer)?;
             buffer.clear();
-            println!("{}", "✔".green().bold());
+            println!("{}", "\u{2713}".green().bold());
         } else if !name.as_os_str().is_empty() {
             zip.add_directory(name.to_str().unwrap(), options)?;
         }

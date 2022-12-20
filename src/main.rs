@@ -53,6 +53,7 @@ fn main() -> std::io::Result<()> {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .author("Tiago Dinis")
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand(
             Command::new("login")
                 .about("Sets the Discloud API token, use .api command on #commands to generate one")
@@ -81,12 +82,6 @@ fn main() -> std::io::Result<()> {
             Command::new("commit")
                 .about("Commits to an app on discloud. If you have more than one app, it will ask which app you want to commit to.")
                 .alias("c")
-        )
-        
-        .subcommand(
-            Command::new("status")
-                .about("Says if a app is on or off")
-                .alias("s")
         )
         .subcommand(
             Command::new("remove")
@@ -132,11 +127,6 @@ fn main() -> std::io::Result<()> {
             .about("Allows to interact with other people's bots, you can use this once someone adds you as a moderator.")
             .subcommand_required(true)
             .arg_required_else_help(true)
-            .subcommand(
-                Command::new("status")
-                    .about("Says if a app is on or off")
-                    .alias("s")
-            )
             .subcommand(
                 Command::new("apps")
                     .about("Shows all bots you have access to.")
@@ -221,11 +211,6 @@ fn main() -> std::io::Result<()> {
         Some(("login", login_matches)) => commands::login::login(login_matches),
         Some(("authstatus", _)) => commands::authstatus::authstatus(),
         Some(("init", _)) => commands::init::init(),
-        
-        Some(("status", _)) => {
-            commands::status::status(false);
-            Ok(())
-        }
         Some(("upload", _)) => {
             commands::upload::upload();
             Ok(())
@@ -292,10 +277,6 @@ fn main() -> std::io::Result<()> {
             }
         },
         Some(("teams", matches)) => match matches.subcommand() {
-            Some(("status", _)) => {
-                commands::status::status(true);
-                Ok(())
-            }
             Some(("commit", _)) => {
                 commands::commit::commit(true);
                 Ok(())

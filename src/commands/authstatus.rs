@@ -5,9 +5,7 @@ pub fn authstatus() -> std::io::Result<()> {
     match auth::get_token() {
         Ok(token) => {
             super::log("You're already logged in!\n");
-            let mut stars = String::new();
-            stars.push_str(&"*".repeat(token.len() - 5));
-            super::log(&format!("Token: {}{}", &token[..5], stars));
+            super::log(&format!("Token: {}{}", "*".repeat(token.len() - 16), &token[token.len()-16..]));
             super::check_token();
         }
         Err(err) => match err.kind() {
