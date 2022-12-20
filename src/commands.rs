@@ -103,7 +103,7 @@ mod tests {
         assert_eq!(super::format_warn("Some warnings"), out)
     }
 }
-
+#[allow(unused)]
 pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<App, FetchError> {
     let mut apps = if teams {
         crate::entities::app::App::fetch_foreign_apps(token)
