@@ -9,10 +9,12 @@ pub fn apps(teams: bool) {
             println!("{}Your apps:", if teams{"(Not) "} else {""});
             for app in apps {
                 println!(
-                    "- {}: ({}) {}",
+                    "- {} (lang: {}, id: {}, Online: {})",
                     app.name.green(),
                     app.lang.yellow(),
-                    app.id.to_string().bright_black()
+                    app.id.to_string().bright_black(),
+                    
+                    if app.online {"yes".green().bold()} else {"no".bright_black().bold()}
                 );
             }
         }

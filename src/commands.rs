@@ -2,7 +2,6 @@ pub mod aboutme;
 pub mod apps;
 pub mod authstatus;
 pub mod commit;
-pub mod status;
 pub mod init;
 pub mod login;
 pub mod logs;
@@ -56,13 +55,17 @@ pub fn check_token() {
     });
 }
 pub fn format_log(msg: &str) -> String {
-    format!("{} {}", "✔".green().bold(), msg)
+    format!("{} {}", "\u{2713}".green().bold(), msg)
 }
 pub fn format_warn(msg: &str) -> String {
     format!("{} {}", "!".yellow().bold(), msg)
 }
 pub fn format_err(msg: &str) -> String {
-    format!("{} {}", "✘".red().bold(), msg)
+    format!("{} {}", "\u{2717}".red().bold(), msg)
+}
+
+pub fn format_confetti(msg: &str) -> String {
+    format!("{} {}", "\u{1f389}".red().bold(), msg)
 }
 pub fn log(msg: &str) {
     println!("{}", format_log(msg));

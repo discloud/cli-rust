@@ -8,8 +8,12 @@ pub fn login(token: String) -> std::io::Result<()> {
 }
 #[tracing::instrument]
 pub fn get_token() -> std::io::Result<String> {
-    let token_file = crate::config_dir::get_path(".discloud_token").unwrap();
-    std::fs::read_to_string(token_file)
+    if let Ok(token) = std::env::var("DISCLOUD_TOKEN") {
+        Ok(token)
+    } else {
+        let token_file = crate::config_dir::get_path(".discloud_token").unwrap();
+        std::fs::read_to_string(token_file)
+    }
 }
 #[tracing::instrument]
 pub fn validate_token() -> bool {
