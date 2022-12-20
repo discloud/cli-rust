@@ -2,7 +2,6 @@ pub mod aboutme;
 pub mod apps;
 pub mod authstatus;
 pub mod commit;
-pub mod status;
 pub mod init;
 pub mod login;
 pub mod logs;
