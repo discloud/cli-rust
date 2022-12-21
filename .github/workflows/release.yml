@@ -9,12 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install latest nightly
+      - name: Install stable rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-            toolchain: nightly
-            override: true
-            components: rustfmt, clippy
+            toolchain: stable
       - name: Publish
         run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
   release:
