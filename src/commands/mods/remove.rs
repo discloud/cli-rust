@@ -13,7 +13,7 @@ pub fn remove(id: u128) {
         spinners::Spinners::Moon,
         format!("Sending {} to the moon", id),
     );
-    let app = handle_result!(App::fetch(token.clone(), app_id), spinner);
+    let app = handle_result!(App::fetch(token.clone(), app_id.clone()), spinner);
     let moderator = handle_result!(Mod::fetch_mod(token.clone(), id, app_id), spinner);
     if let Some(moderator) = moderator {
         handle_result!(moderator.remove(token), spinner);

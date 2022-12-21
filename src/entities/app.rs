@@ -44,7 +44,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn fetch(token: String, id: u128) -> Result<App, FetchError> {
+    pub fn fetch(token: String, id: String) -> Result<App, FetchError> {
         #[derive(Deserialize)]
         struct AppResponse {
             pub apps: App,
@@ -64,7 +64,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn get_logs(token: String, id: u128, team: bool) -> Result<String, FetchError> {
+    pub fn get_logs(token: String, id: String, team: bool) -> Result<String, FetchError> {
         #[derive(Deserialize)]
         struct Terminal {
             big: String,
@@ -98,7 +98,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn restart(token: String, id: u128, team: bool) -> Result<(), FetchError> {
+    pub fn restart(token: String, id: String, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/{}/{}/restart", if team {"team"} else {"app"}, id)))
@@ -114,7 +114,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn start(token: String, id: u128, team: bool) -> Result<(), FetchError> {
+    pub fn start(token: String, id: String, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/{}/{}/start", if team {"team"} else {"app"}, id)))
@@ -130,7 +130,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn stop(token: String, id: u128, team: bool) -> Result<(), FetchError> {
+    pub fn stop(token: String, id: String, team: bool) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .put(crate::api_url!(format!("/{}/{}/stop", if team {"team"} else {"app"}, id)))
@@ -146,7 +146,7 @@ impl App {
             Err(err) => Err(FetchError::FailedToConnect(err)),
         }
     }
-    pub fn delete(token: String, id: u128) -> Result<(), FetchError> {
+    pub fn delete(token: String, id: String) -> Result<(), FetchError> {
         let client = reqwest::blocking::Client::new();
         let req = client
             .delete(crate::api_url!(format!("/app/{}/delete", id)))

@@ -43,13 +43,13 @@ pub struct Mod {
     #[serde(rename = "perms")]
     features: Vec<Feature>,
     #[serde(skip)]
-    app_id: u128,
+    app_id: String,
 }
 impl Mod {
     pub fn new(
         token: String,
         user_id: u128,
-        app_id: u128,
+        app_id: String,
         features: Vec<Feature>,
     ) -> Result<Mod, FetchError> {
         let moderator = Self {
@@ -97,7 +97,7 @@ impl Mod {
     pub fn fetch_mod(
         token: String,
         user_id: u128,
-        app_id: u128,
+        app_id: String,
     ) -> Result<Option<Mod>, FetchError> {
         #[derive(Deserialize)]
         struct Response {

@@ -131,8 +131,8 @@ pub fn ask_for_app(token: String, action: &str, teams: bool) -> Result<App, Fetc
     }
 }
 
-pub fn ask_for_app_id(token: String, action: &str, teams: bool) -> Result<u128, FetchError> {
-    let apps = if teams {
+pub fn ask_for_app_id(token: String, action: &str, teams: bool) -> Result<String, FetchError> {
+    let mut apps = if teams {
         crate::entities::app::App::fetch_foreign_apps(token)
     } else {
         crate::entities::app::App::fetch_all(token)
@@ -142,7 +142,7 @@ pub fn ask_for_app_id(token: String, action: &str, teams: bool) -> Result<u128, 
             err("You don't have any apps!");
             std::process::exit(1);
         },
-        1 => Ok(apps[0].id.parse().unwrap()),
+        1 => Ok(apps.remove(0).id),
         _ => {
             let options = apps
                 .iter()
@@ -153,7 +153,7 @@ pub fn ask_for_app_id(token: String, action: &str, teams: bool) -> Result<u128, 
                 .with_prompt(format!("Which app you want to {}?", action))
                 .interact()
                 .unwrap();
-            Ok(apps[chosen_opt].id.parse().unwrap())
+            Ok(apps.remove(chosen_opt).id)
         }
     }
 }

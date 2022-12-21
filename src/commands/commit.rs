@@ -115,7 +115,7 @@ fn zip_dir_to_file(
     Ok(())
 }
 #[tracing::instrument]
-fn upload_zip(token: String, app_id: u128, teams: bool) -> Result<(), String> {
+fn upload_zip(token: String, app_id: String, teams: bool) -> Result<(), String> {
     let file_path = get_zip_file_path();
     let file_path = file_path.to_str().unwrap();
     let client = reqwest::blocking::Client::builder()
