@@ -57,9 +57,9 @@ fn color_plan(plan: String) -> String {
         "Platinum" => plan.blue().bold().to_string(),
         "Diamond" => plan.cyan().bold().to_string(),
         "Ruby" => plan.red().bold().to_string(),
-        "Sapphire" => plan.bright_red().bold().to_string(),
+        "Safira" | "Sapphire" => plan.bright_red().bold().to_string(),
         "Krypton" => plan.bright_green().bold().to_string(),
         "Special" => plan.bright_cyan().bold().to_string(),
-        _ => unreachable!(),
+        _ => plan,
     }
 }
