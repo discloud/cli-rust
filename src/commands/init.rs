@@ -4,7 +4,7 @@ fn vec_from_str(s: String) -> Vec<String> {
     s.split(',').map(|s| s.trim().into()).collect()
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 enum AppTyp {
     #[default]
     Bot,
@@ -91,6 +91,17 @@ pub fn init() -> std::io::Result<()> {
         .interact_text()?;
     app.ram = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Memory (MB)")
+        .validate_with(|input: &u64| {
+            let min_ram = match app.typ {
+                AppTyp::Bot => 512u64,
+                AppTyp::Site => 100u64
+            };
+            if *input > min_ram {
+                Ok(())
+            } else {
+                Err(format!("The minimum ram amount for {:#?}s is {min_ram}", app.typ))
+            }
+        })
         .interact_text()?;
     let apt: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("APT Packages")
