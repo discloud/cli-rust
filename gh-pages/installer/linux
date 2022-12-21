@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+DISCLOUD_ZIP=$(mktemp discloud-XXXXXXXX.zip -p /tmp)
+OUT_DIR=$HOME/.local/bin/
+echo "Downloading latest Discloud CLI version"
+curl -L https://github.com/discloud/cli-rust/releases/latest/download/discloud-x86_64-Linux.zip > $DISCLOUD_ZIP
+echo "Extracting files"
+mkdir $OUT_DIR -p
+unzip -o -d $OUT_DIR $DISCLOUD_ZIP discloud
+if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
+    echo "The PATH variable was already setup correctly"
+else
+    echo "Adding ~/.local/bin to PATH variable to your shell init script"
+    echo "export PATH=\$PATH:\$HOME/.local/bin/" >> $HOME/.$(basename $SHELL)rc
+fi
+echo "Cleaning up temporary files"
+rm $DISCLOUD_ZIP -f
+echo "Done! Restart your terminal for it to take effect, or run 'exec $(basename $SHELL)' to activate it on this terminal..."
