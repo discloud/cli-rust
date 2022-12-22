@@ -93,8 +93,8 @@ pub fn init() -> std::io::Result<()> {
         .with_prompt("Memory (MB)")
         .validate_with(|input: &u64| {
             let min_ram = match app.typ {
-                AppTyp::Bot => 512u64,
-                AppTyp::Site => 100u64
+                AppTyp::Site => 512u64,
+                AppTyp::Bot => 100u64
             };
             if *input > min_ram {
                 Ok(())
