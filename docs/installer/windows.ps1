@@ -1,5 +1,6 @@
 
 function Add-Path($Path) {
+    $env:Path += ":" + $Path;
     $Path = [Environment]::GetEnvironmentVariable("PATH", "User") + [IO.Path]::PathSeparator + $Path
     [Environment]::SetEnvironmentVariable( "Path", $Path, "User")
 }
@@ -10,7 +11,12 @@ $out_dir = $env:APPDATA + "\discloud\"
 mkdir $out_dir -ea 0
 "Extracting files"
 Expand-Archive $discloud_zip -DestinationPath $out_dir -Force
-Add-Path $out_dir
+if([Environment]::GetEnvironmentVariable("PATH", "User") -split ";" -ccontains $out_dir) {
+    "Path is already setup correctly"
+} else {
+    Add-Path $out_dir
+    "Path configured successfully"
+}
 "Cleaning up temporary files"
 Remove-Item $discloud_zip.FullName -Force
 "Done! You might want to restart your system to make the discloud cli available in the PATH"
