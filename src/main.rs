@@ -2,6 +2,7 @@ pub mod auth;
 mod commands;
 pub mod config_dir;
 pub mod entities;
+pub mod zip_directory;
 use clap::*;
 use entities::moderator::Feature;
 use tracing_subscriber::prelude::*;
@@ -17,7 +18,7 @@ macro_rules! api_url {
         concat!($crate::api_url!(), $api)
     };
 }
-fn main() -> std::io::Result<()> {
+fn main() {
     tracing_subscriber::Registry::default()
         .with(sentry::integrations::tracing::layer())
         .init();
@@ -43,10 +44,12 @@ fn main() -> std::io::Result<()> {
         },
     ));
     if let Some(dir) = config_dir::get_proj_dir() {
-        std::fs::create_dir_all(dir)?;
+        if let Err(err) = std::fs::create_dir_all(dir) {
+            eprintln!("ERROR: Couldn't create a directory for config files: {err}");
+        }
     } else {
         eprintln!("ERROR: Couldn't find a directory for config files.");
-        return Ok(());
+        return;
     }
     let cmd = Command::new("discloud")
         .about("Blazingly Fast CLI for discloud")
@@ -208,109 +211,124 @@ fn main() -> std::io::Result<()> {
         );
     let matches = cmd.get_matches();
     match matches.subcommand() {
-        Some(("login", login_matches)) => commands::login::login(login_matches),
-        Some(("authstatus", _)) => commands::authstatus::authstatus(),
-        Some(("init", _)) => commands::init::init(),
+        Some(("login", login_matches)) => {
+            if let Err(err) = commands::login::login(login_matches) {
+                sentry::capture_error(&err);
+            }
+            
+        },
+        Some(("authstatus", _)) => {
+            if let Err(err) = commands::authstatus::authstatus() {
+                sentry::capture_error(&err);
+            }
+            
+        },
+        Some(("init", _)) => {
+            if let Err(err) = commands::init::init() {
+                sentry::capture_error(&err);
+            }
+            
+        },
         Some(("upload", _)) => {
             commands::upload::upload();
-            Ok(())
+            
         }
         Some(("commit", _)) => {
             commands::commit::commit(false);
-            Ok(())
+            
         }
         Some(("remove", _)) => {
             commands::remove::remove();
-            Ok(())
+            
         }
         Some(("apps", _)) => {
             commands::apps::apps(false);
-            Ok(())
+            
         }
         Some(("stop", _)) => {
             commands::stop::stop(false);
-            Ok(())
+            
         }
 
         Some(("start", _)) => {
             commands::start::start(false);
-            Ok(())
+            
         }
         Some(("restart", _)) => {
             commands::restart::restart(false);
-            Ok(())
+            
         }
         Some(("logs", _)) => {
             commands::logs::logs(false);
-            Ok(())
+            
         }
         Some(("aboutme", _)) => {
             commands::aboutme::aboutme();
-            Ok(())
+            
         }
         Some(("mods", matches)) => match matches.subcommand() {
             Some(("add", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
                 commands::mods::add::add(id);
-                Ok(())
+                
             }
             Some(("remove", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
                 commands::mods::remove::remove(id);
-                Ok(())
+                
             }
             Some(("deny", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
                 let features: Vec<Feature> = matches.get_many("perm").unwrap().cloned().collect();
                 commands::mods::deny::deny(id, features);
-                Ok(())
+                
             }
             Some(("allow", matches)) => {
                 let id: u128 = *matches.get_one("id").unwrap();
                 let features: Vec<Feature> = matches.get_many("perm").unwrap().cloned().collect();
                 commands::mods::allow::allow(id, features);
-                Ok(())
+                
             }
             cmd => {
                 eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
-                Ok(())
+                
             }
         },
         Some(("teams", matches)) => match matches.subcommand() {
             Some(("commit", _)) => {
                 commands::commit::commit(true);
-                Ok(())
+                
             }
             Some(("apps", _)) => {
                 commands::apps::apps(true);
-                Ok(())
+                
             }
 
             Some(("stop", _)) => {
                 commands::stop::stop(true);
-                Ok(())
+                
             }
                 
             Some(("start", _)) => {
                 commands::start::start(true);
-                Ok(())
+                
             }
             Some(("restart", _)) => {
                 commands::restart::restart(true);
-                Ok(())
+                
             }
             Some(("logs", _)) => {
                 commands::logs::logs(true);
-                Ok(())
+                
             }
             cmd => {
                 eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
-                Ok(())
+                
             }
         },
         cmd => {
             eprintln!("{:#?} command is not implemented yet.", cmd.unwrap().0);
-            Ok(())
+            
         }
     }
 }
