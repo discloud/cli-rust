@@ -96,7 +96,7 @@ pub fn init() -> std::io::Result<()> {
                 AppTyp::Site => 512u64,
                 AppTyp::Bot => 100u64
             };
-            if *input > min_ram {
+            if *input >= min_ram {
                 Ok(())
             } else {
                 Err(format!("The minimum ram amount for {:#?}s is {min_ram}", app.typ))
