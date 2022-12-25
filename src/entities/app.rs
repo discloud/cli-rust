@@ -67,6 +67,7 @@ impl App {
     pub fn get_logs(token: String, id: String, team: bool) -> Result<String, FetchError> {
         #[derive(Deserialize)]
         struct Terminal {
+            #[serde(default)]
             big: String,
         }
         #[derive(Deserialize)]
