@@ -453,7 +453,7 @@ dependencies = [
 
 [[package]]
 name = "discloud"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "chrono",
  "clap",
